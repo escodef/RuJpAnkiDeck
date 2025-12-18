@@ -1,0 +1,4 @@
+soundfile
+misaki[ja]
+python-dotenv
+kokoro>=0.9.4

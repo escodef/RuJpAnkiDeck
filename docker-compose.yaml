@@ -1,0 +1,10 @@
+services:
+  tts-python-service: 
+    container_name: tts-python-service
+    build: 
+      context: .
+      dockerfile: tts/Dockerfile
+    environment:
+      - CSV_FILE=${CSV_FILE}
+    volumes:
+      - ${TTS_OUTPUT_FOLDER}:/home/app/temp
