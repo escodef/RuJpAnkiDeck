@@ -87,10 +87,14 @@ class WordParserGUI:
                 if current_text == last_text or current_re != re:
                     break
 
+                dot_count = current_text.splitlines()[1].count("・")
+
+
                 results.append(current_text)
                 last_text = current_text
                 table.set_focus()
-                send_keys('{VK_DOWN}')
+                for _ in range(dot_count + 1):
+                    send_keys('{VK_DOWN}')
                 time.sleep(0.1)
 
 
@@ -123,14 +127,12 @@ class WordParserGUI:
             return None
 
     def get_mainsense(self, article: str) -> str:
-        processed_results = []
+        processed_result = ''
 
-        if re.search(r'^\d+\.', article.strip()):
+        if re.search(r'^\d+\.', article.strip(), re.MULTILINE):
             items = re.findall(r'\d+\.\s*([^;\n]+)', article)
-            combined = "; ".join(items[:2])
-            processed_results.append(combined)
+            processed_result = items[0] 
         else:
-            main_part = article.split(';')[0].strip()
-            processed_results.append(main_part)
+            processed_result = article.split(';')[0].strip()
 
-        return "\n".join(processed_results)
+        return processed_result
