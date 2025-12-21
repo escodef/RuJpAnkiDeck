@@ -32,7 +32,6 @@ model['css'] = """
     background-color: #2c2c2c;
 }
 
-/* Настройки для темной темы Anki */
 .nightMode .card {
     background-color: #1a1a1a;
     color: #ffffff;

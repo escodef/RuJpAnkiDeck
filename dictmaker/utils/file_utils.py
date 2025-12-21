@@ -1,9 +1,32 @@
-import json
-from models.models import DictionaryList
+import os
+import logging
 
-def save_dictionary(dictionary: DictionaryList, filepath: str):
-    """Сохраняет список переводов в JSON файл"""
-    data = [translation.model_dump(mode='python') for translation in dictionary]
+from models.models import Base, TranslationTable, ExampleTable, DictionaryList
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+db_path = os.getenv("DB_PATH", "dictionary.db")
+engine = create_engine(f'sqlite:///{db_path}')
+Session = sessionmaker(bind=engine)
+
+def init_db():
+    Base.metadata.create_all(engine)
+
+def save_to_sqlite(dictionary: DictionaryList):
+    session = Session()
+    logging.debug('Started inserting data')
+    try:
+        for item in dictionary:
+            db_translation = TranslationTable(
+                word=item.word,
+                reading=item.reading,
+                mainsense=item.mainsense,
+                senses=item.senses
+            )
+            for ex in item.examples:
+                db_translation.examples.append(ExampleTable(ja=ex.ja, re=ex.re, tr=ex.tr))
+            session.add(db_translation)
+        session.commit()
+    finally:
+        session.close()
+        logging.debug('Done')

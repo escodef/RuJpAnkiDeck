@@ -7,8 +7,8 @@ from typing import List
 from models.models import DictionaryList
 from parsers.word_parser import WordParser
 from parsers.gui_word_parser import WordParserGUI
-from utils.file_utils import save_dictionary
 from dotenv import load_dotenv
+from utils.file_utils import init_db, save_to_sqlite
 
 load_dotenv()
 
@@ -54,15 +54,16 @@ class JapaneseDictionaryParser:
                 logging.error(f"Ошибка при парсинге {word[0]}: {e}")
                 logging.error(traceback.format_exc())
                 continue
-        
-        save_dictionary(self.dictionary, './dictionary.json')
+
+        save_to_sqlite(self.dictionary)
         return self.dictionary
 
 def main():
+    init_db()
     words_to_parse = get_words()
     
     parser = JapaneseDictionaryParser()
-    dictionary = parser.parse_words(words_to_parse[:10])
+    dictionary = parser.parse_words(words_to_parse[:1])
     
     logging.info(f"Запарсил слов: {len(dictionary)}")
 
