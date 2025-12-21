@@ -1,15 +1,20 @@
 import os
-import json
+import sys
+
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
 from dotenv import load_dotenv
 
 load_dotenv()
 
-json_dict = os.getenv("DICT_JSON_OUTPUT")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-with open(json_dict, 'r', encoding='utf-8') as f:
-    data = json.load(f)
+from shared.database.db_session import SessionLocal
+from shared.database.models import TranslationTable
+
+session = SessionLocal()
+translations = session.query(TranslationTable).all()
+session.close()
 
 temp_db = "temp_col.anki2"
 if os.path.exists(temp_db):
@@ -90,12 +95,12 @@ col.models.add(model)
 deck_id_jp = col.decks.id("Слова::Японский -> Русский")
 deck_id_ru = col.decks.id("Слова::Русский -> Японский")
 
-for item in data:
-    word = item['word'].strip()
+for item in translations:
+    word = item.word.strip()
 
-    reading = item['reading'].replace('\r\n', '<br>').replace('\n', '<br>').strip()
-    mainsense = item['mainsense'].replace('\r\n', '<br>').replace('\n', '<br>').strip()
-    senses = item['senses'].replace('\r\n', '<br>').replace('\n', '<br>').strip()
+    reading = item.reading.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+    mainsense = item.mainsense.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+    senses = item.senses.replace('\r\n', '<br>').replace('\n', '<br>').strip()
     
     note = col.new_note(model)
     note['Word'] = word

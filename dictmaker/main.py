@@ -2,15 +2,19 @@ import csv
 import os
 import logging
 import traceback
+import sys
 
 from typing import List
 from models.models import DictionaryList
 from parsers.word_parser import WordParser
 from parsers.gui_word_parser import WordParserGUI
 from dotenv import load_dotenv
-from utils.file_utils import init_db, save_to_sqlite
-
 load_dotenv()
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from shared.database.db_session import init_db
+from shared.database.utils import save_to_sqlite
 
 csv_name = os.getenv("CSV_FILE")
 dict_url = os.getenv("DICT_URL")
@@ -46,7 +50,6 @@ class JapaneseDictionaryParser:
 
                 logging.info(translations)
                 
-
                 for translation in translations:
                     self.dictionary.append(translation)
                 
