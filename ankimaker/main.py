@@ -10,7 +10,8 @@ load_dotenv()
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.database.db_session import init_db
-from shared.database.utils import search_translations
+from shared.database.utils import get_by_reading
+from shared.csv.utils import get_words
 
 init_db()
 
@@ -93,12 +94,18 @@ col.models.add(model)
 deck_id_jp = col.decks.id("Слова::Японский -> Русский")
 deck_id_ru = col.decks.id("Слова::Русский -> Японский")
 
-for item in translations:
-    word = item.word.strip()
+words_to_parse = get_words()
 
-    reading = item.reading.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-    mainsense = item.mainsense.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-    senses = item.senses.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+for item in words_to_parse:
+    word = item[0]
+    translation = get_by_reading(word)
+    if len(translation) == 0:
+        continue
+    translation = translation[0]
+
+    reading = translation.reading.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+    mainsense = translation.mainsense.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+    senses = translation.senses.replace('\r\n', '<br>').replace('\n', '<br>').strip()
     
     note = col.new_note(model)
     note['Word'] = word
