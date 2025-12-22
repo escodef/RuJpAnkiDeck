@@ -1,17 +1,11 @@
 import os
-import logging
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .models import Base
 
-def get_engine():
-    db_path = os.getenv("DB_PATH", "dictionary.db") 
-    return create_engine(f'sqlite:///{db_path}')
+db_path = os.getenv("DB_PATH", "dictionary.db")
+engine = create_engine(f'sqlite:///{db_path}')
+SessionLocal = sessionmaker(bind=engine)
 
 def init_db():
-    logging.debug('init_db()')
-    Base.metadata.create_all(get_engine())
-    logging.debug('init_db() done\n')
-
-SessionLocal = sessionmaker(bind=get_engine())
+    from .models import Base
+    Base.metadata.create_all(engine)

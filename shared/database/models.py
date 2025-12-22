@@ -7,9 +7,10 @@ class TranslationTable(Base):
     __tablename__ = 'translations'
     id = Column(Integer, primary_key=True)
     word = Column(String, index=True)
-    reading = Column(String)
+    reading = Column(String, index=True)
     mainsense = Column(String)
     senses = Column(String)
+    index_csv = Column(Integer)
     examples = relationship("ExampleTable", back_populates="translation")
 
 class ExampleTable(Base):

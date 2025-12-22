@@ -39,10 +39,12 @@ class WordParserGUI:
         kata = wordcsv[2]
         re = ''
         kks = self.kks.convert(kata)
-        ts = []
+        ts: List[Translation] = []
 
         for item in kks:
             re += item['hira']
+        
+        self.logger.debug(f"Got reading {re}")
 
         try:
             input_box = self.win.child_window(auto_id="202", control_type="Edit")
@@ -61,11 +63,12 @@ class WordParserGUI:
                 pane.set_focus()
                 pane.click_input()
                 send_keys('^a^c')
-                time.sleep(0.1)
                 current_re = pyperclip.paste().strip().splitlines()[0]
+
+                variants = [v.strip() for v in current_re.split('・')]
                 
-                if current_re == last_re or current_re != re:
-                    if current_re != re:
+                if current_re == last_re or (re not in variants and kata not in variants):
+                    if re not in variants and kata not in variants:
                         table.set_focus()
                         send_keys('{VK_DOWN}')
                     break
@@ -81,10 +84,12 @@ class WordParserGUI:
                 pane.set_focus()
                 pane.click_input()
                 send_keys('^a^c')
-                time.sleep(0.1)
                 current_text = pyperclip.paste().strip()
                 current_re = current_text.splitlines()[0]
-                if current_text == last_text or current_re != re:
+                variants = [v.strip() for v in current_re.split('・')]
+                self.logger.debug(f"Variants {variants}")
+
+                if current_text == last_text or (re not in variants and kata not in variants):
                     break
 
                 dot_count = current_text.splitlines()[1].count("・")
@@ -108,7 +113,6 @@ class WordParserGUI:
 
                 senses = "\n".join(sents[strip:]).strip()
                 
-                print(f"Найдена статья:\n{senses}\n---")
                 mainsense = self.get_mainsense(senses)
 
                 t = Translation(

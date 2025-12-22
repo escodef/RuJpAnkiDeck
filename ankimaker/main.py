@@ -9,12 +9,10 @@ load_dotenv()
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from shared.database.db_session import SessionLocal
-from shared.database.models import TranslationTable
+from shared.database.db_session import init_db
+from shared.database.utils import search_translations
 
-session = SessionLocal()
-translations = session.query(TranslationTable).all()
-session.close()
+init_db()
 
 temp_db = "temp_col.anki2"
 if os.path.exists(temp_db):
