@@ -1,11 +1,15 @@
 import os
 import sys
+import logging
 
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
+from template import CARD_CSS, JP_RU_FRONT, JP_RU_BACK, RU_JP_FRONT, RU_JP_BACK
 from dotenv import load_dotenv
 
 load_dotenv()
+
+tts_folder = os.getenv("TTS_OUTPUT_FOLDER")
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -27,98 +31,64 @@ col.models.add_field(model, col.models.new_field("Reading"))
 col.models.add_field(model, col.models.new_field("MainSense"))
 col.models.add_field(model, col.models.new_field("Senses"))
 
-model['css'] = """
-.card {
-    font-family: "Segoe UI", "Helvetica", sans-serif;
-    font-size: 22px;
-    text-align: center;
-    color: #e0e0e0;
-    background-color: #2c2c2c;
-}
-
-.nightMode .card {
-    background-color: #1a1a1a;
-    color: #ffffff;
-}
-
-.jp { 
-    font-size: 45px; 
-    font-weight: bold; 
-    color: #64b5f6; 
-    margin-top: 10px;
-}
-
-.reading { 
-    font-size: 22px; 
-    color: #b0bec5; 
-    margin-bottom: 10px; 
-}
-
-.meaning { 
-    font-size: 28px; 
-    font-weight: bold; 
-    color: #81c784; 
-}
-
-.extra { 
-    font-size: 18px; 
-    color: #90a4ae; 
-    font-style: italic; 
-    margin-top: 15px; 
-}
-
-hr { 
-    border: none; 
-    border-top: 1px solid #444; 
-    margin: 20px 0; 
-}
-"""
+model['css'] = CARD_CSS
 
 t1 = col.models.new_template("JP -> RU")
-t1['qfmt'] = '<div class="jp">{{Word}}</div>'
-t1['afmt'] = """{{FrontSide}}<hr>
-<div class="reading">{{Reading}}</div>
-<div class="meaning">{{MainSense}}</div>
-<div class="extra">{{Senses}}</div>"""
+t1['qfmt'] = JP_RU_FRONT
+t1['afmt'] = JP_RU_BACK
 col.models.add_template(model, t1)
 
 t2 = col.models.new_template("RU -> JP")
-t2['qfmt'] = '<div class="meaning">{{MainSense}}</div>'
-t2['afmt'] = """{{FrontSide}}<hr>
-<div class="jp">{{Word}}</div>
-<div class="reading">{{Reading}}</div>
-<div class="extra">{{Senses}}</div>"""
+t2['qfmt'] = RU_JP_FRONT
+t2['afmt'] = RU_JP_BACK
 col.models.add_template(model, t2)
 col.models.add(model)
 
-deck_id_jp = col.decks.id("Слова::Японский -> Русский")
-deck_id_ru = col.decks.id("Слова::Русский -> Японский")
-
 words_to_parse = get_words()
 
-for item in words_to_parse:
+for index, item in enumerate(words_to_parse[:100]):
+    start_range = (index // 5000) * 5
+    end_range = start_range + 5
+    range_str = f"{start_range:02d}-{end_range:02d}k"
+    
+    current_deck_id_jp = col.decks.id(f"Слова::Японский - Русский::{range_str}")
+    current_deck_id_ru = col.decks.id(f"Слова::Русский - Японский::{range_str}")
+
     word = item[0]
-    translation = get_by_reading(word)
-    if len(translation) == 0:
+    translations = get_by_reading(word)
+    if not translations:
+        logging.warning(f'translations not found for {word}')
         continue
-    translation = translation[0]
 
-    reading = translation.reading.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-    mainsense = translation.mainsense.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-    senses = translation.senses.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-    
-    note = col.new_note(model)
-    note['Word'] = word
-    note['Reading'] = reading
-    note['MainSense'] = mainsense
-    note['Senses'] = senses
-    col.add_note(note, deck_id_jp)
+    for translation in translations:
 
-    cards = note.cards()
-    card_ru = cards[1]
-    card_ru.did = deck_id_ru
-    
-    col.update_card(card_ru)
+        word_val = translation.word.strip()
+        reading = translation.reading.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+        mainsense = translation.mainsense.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+        senses = translation.senses.replace('\r\n', '<br>').replace('\n', '<br>').strip()
+        
+        note = col.new_note(model)
+        note['Word'] = word_val
+        note['Reading'] = reading
+        note['MainSense'] = mainsense
+        note['Senses'] = senses
+
+        # audio_filename = f"{word_val}.wav"
+        # audio_path = os.path.join(tts_folder, audio_filename)
+
+        # if os.path.exists(audio_path):
+        #     col.media.add_file(audio_path)
+        #     note['Reading'] += f" [sound:{audio_filename}]"
+
+        col.add_note(note, current_deck_id_jp)
+
+        cards = note.cards()
+        if len(cards) > 1:
+            card_ru = cards[1]
+            card_ru.did = current_deck_id_ru
+            col.update_card(card_ru)
+        if index % 1000 == 0:
+            col.save()
 
 exporter = AnkiPackageExporter(col)
 output_file = "japanese_vocab.apkg"

@@ -31,9 +31,9 @@ def get_by_reading(query):
         results = session.query(TranslationTable).filter(
             or_(
                 TranslationTable.word.contains(query),
-                TranslationTable.reading.contains(query)
+                TranslationTable.reading == query,
             )
-        ).all()
+        ).limit(3).all()
         return results
     finally:
         session.close()
