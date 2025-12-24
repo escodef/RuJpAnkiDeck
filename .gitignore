@@ -28,6 +28,8 @@ MANIFEST
 dictionary.json
 dictionary.db
 japanese_vocab.apkg
+output/
+temp_col.media/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -139,6 +141,7 @@ celerybeat.pid
 
 # Environments
 .env
+docker.env
 .envrc
 .venv
 env/

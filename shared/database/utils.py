@@ -25,18 +25,31 @@ def save_to_sqlite(dictionary):
     finally:
         session.close()
 
-def get_by_reading(query):
+
+def get_by_word_or_reading(word: str, reading: str):
     session = SessionLocal()
     try:
         results = session.query(TranslationTable).filter(
             or_(
-                TranslationTable.word.contains(query),
-                TranslationTable.reading == query,
+                TranslationTable.word == word,
+                TranslationTable.reading == reading,
             )
         ).limit(3).all()
         return results
     finally:
         session.close()
+
+
+def get_by_word(word: str):
+    session = SessionLocal()
+    try:
+        results = session.query(TranslationTable).filter(
+            TranslationTable.word == word,
+        ).limit(1).all()
+        return results
+    finally:
+        session.close()
+
 
 def get_by_index(query: int):
     session = SessionLocal()

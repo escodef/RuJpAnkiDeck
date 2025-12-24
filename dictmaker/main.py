@@ -92,7 +92,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        dictionary = parser.parse_words(words_to_parse[:2000])
+        dictionary = parser.parse_words(words_to_parse[:2500])
 
         logging.info(f"Parsed words: {len(dictionary)}")
     finally:

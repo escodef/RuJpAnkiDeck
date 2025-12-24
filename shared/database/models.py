@@ -6,7 +6,7 @@ Base = declarative_base()
 class TranslationTable(Base):
     __tablename__ = 'translations'
     id = Column(Integer, primary_key=True)
-    word = Column(String, index=True)
+    word = Column(String, index=True, unique=True)
     reading = Column(String, index=True)
     mainsense = Column(String)
     senses = Column(String)

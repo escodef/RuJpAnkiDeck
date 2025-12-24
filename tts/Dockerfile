@@ -24,5 +24,6 @@ RUN pip install -r requirements.txt
 RUN python -m unidic download
 
 COPY tts/main.py .
+COPY shared/csv/ ./shared/csv
 
 CMD ["python", "main.py"]
