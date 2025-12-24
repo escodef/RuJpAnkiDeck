@@ -1,20 +1,22 @@
 import os
+import sys
+from dotenv import load_dotenv
+load_dotenv()
+
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(root_path)
+
 import logging
 import traceback
-import sys
 import signal
 
 from typing import List
 from models.models import DictionaryList
 from parsers.word_parser import WordParser
 from parsers.gui_word_parser import WordParserGUI
-from dotenv import load_dotenv
-load_dotenv()
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.database.db_session import init_db, SessionLocal
-from shared.database.utils import save_to_sqlite, get_by_index
+from shared.database.utils import save_to_sqlite, get_by_index, get_by_word
 from shared.csv.utils import get_words
 
 dict_url = os.getenv("DICT_URL")
@@ -54,8 +56,9 @@ class JapaneseDictionaryParser:
             if not self.running:
                 break
             try:
+                exists = get_by_word(word[0])
                 is_parsed_before = get_by_index(index)
-                if len(is_parsed_before) > 0:
+                if len(is_parsed_before) > 0 or exists:
                     continue
                 logging.info(f"Parsing word: {word[0]}")
                 
@@ -74,8 +77,6 @@ class JapaneseDictionaryParser:
                     self.dictionary.append(translation)
                 if len(translations) == 0:
                     logging.warning(f"translations len: {len(translations)} for word {word[0]} at index {index}")
-                    # break
-                
                 
             except Exception as e:
                 logging.error(f"Error when parsing {word[0]}: {e}")
@@ -92,7 +93,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        dictionary = parser.parse_words(words_to_parse[:2500])
+        dictionary = parser.parse_words(words_to_parse[:2])
 
         logging.info(f"Parsed words: {len(dictionary)}")
     finally:

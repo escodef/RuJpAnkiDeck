@@ -1,6 +1,5 @@
 from .models import TranslationTable, ExampleTable
 from .db_session import SessionLocal
-from sqlalchemy import or_
 
 def save_to_sqlite(dictionary):
     session = SessionLocal()
@@ -26,26 +25,30 @@ def save_to_sqlite(dictionary):
         session.close()
 
 
-def get_by_word_or_reading(word: str, reading: str):
+def get_by_word_or_reading(word: str, reading: str) -> list[TranslationTable]:
     session = SessionLocal()
     try:
+        result = session.query(TranslationTable).filter(
+            TranslationTable.word == word
+        ).first()
+
+        if result:
+            return [result]
+
         results = session.query(TranslationTable).filter(
-            or_(
-                TranslationTable.word == word,
-                TranslationTable.reading == reading,
-            )
+            TranslationTable.reading == reading
         ).limit(3).all()
+        
         return results
     finally:
         session.close()
-
 
 def get_by_word(word: str):
     session = SessionLocal()
     try:
         results = session.query(TranslationTable).filter(
             TranslationTable.word == word,
-        ).limit(1).all()
+        ).first()
         return results
     finally:
         session.close()

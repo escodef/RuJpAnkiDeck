@@ -8,7 +8,6 @@ from typing import List
 from pywinauto import Desktop, Application
 from models.models import Translation
 from pywinauto.keyboard import send_keys
-from shared.database.utils import get_by_word
 from utils.re_utils import has_cyrillic
 
 class WordParserGUI:
@@ -110,11 +109,7 @@ class WordParserGUI:
 
                 if not has_cyrillic(sents[1]):
                     word = sents[1]
-                    strip = 2 
-                
-                exists = get_by_word(word)
-                if exists: 
-                    continue
+                    strip = 2
 
                 senses = "\n".join(sents[strip:]).strip()
                 
