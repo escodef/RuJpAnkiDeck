@@ -16,8 +16,9 @@ from parsers.word_parser import WordParser
 from parsers.gui_word_parser import WordParserGUI
 
 from shared.database.db_session import init_db, SessionLocal
-from shared.database.utils import save_to_sqlite, get_by_index, get_by_word
+from shared.database.utils import save_to_sqlite, get_by_index, get_by_word, get_by_reading
 from shared.csv.utils import get_words
+from utils.re_utils import has_kanji
 
 dict_url = os.getenv("DICT_URL")
 jardic_path = os.getenv("JARDIC_PATH")
@@ -56,11 +57,16 @@ class JapaneseDictionaryParser:
             if not self.running:
                 break
             try:
-                exists = get_by_word(word[0])
+                exists = None
+                if has_kanji(word[0]):
+                    exists = get_by_word(word[0])
+                else: 
+                    exists = get_by_reading(word[0])
+
                 is_parsed_before = get_by_index(index)
                 if len(is_parsed_before) > 0 or exists:
                     continue
-                logging.info(f"Parsing word: {word[0]}")
+                logging.info(f"Parsing word: {word[0]} at index {index}")
                 
                 if self.is_windows and self.gui_parser:
                     translations = self.gui_parser.parse_word(word)
@@ -93,7 +99,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        dictionary = parser.parse_words(words_to_parse[:2])
+        dictionary = parser.parse_words(words_to_parse[:2800])
 
         logging.info(f"Parsed words: {len(dictionary)}")
     finally:

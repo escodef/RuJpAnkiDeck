@@ -43,7 +43,7 @@ def get_by_word_or_reading(word: str, reading: str) -> list[TranslationTable]:
     finally:
         session.close()
 
-def get_by_word(word: str):
+def get_by_word(word: str) -> TranslationTable | None:
     session = SessionLocal()
     try:
         results = session.query(TranslationTable).filter(
@@ -53,6 +53,15 @@ def get_by_word(word: str):
     finally:
         session.close()
 
+def get_by_reading(reading: str) -> TranslationTable | None:
+    session = SessionLocal()
+    try:
+        results = session.query(TranslationTable).filter(
+            TranslationTable.reading == reading,
+        ).first()
+        return results
+    finally:
+        session.close()
 
 def get_by_index(query: int):
     session = SessionLocal()
