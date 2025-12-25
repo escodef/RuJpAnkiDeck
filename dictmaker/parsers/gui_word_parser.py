@@ -8,8 +8,7 @@ from typing import List
 from pywinauto import Desktop, Application
 from models.models import Translation
 from pywinauto.keyboard import send_keys
-from utils.re_utils import has_cyrillic
-from shared.database.utils import get_by_word
+from shared.regex.utils import has_cyrillic
 
 
 class WordParserGUI:
@@ -115,11 +114,6 @@ class WordParserGUI:
                 senses = "\n".join(sents[strip:]).strip()
                 
                 mainsense = self.get_mainsense(senses)
-
-                exists = get_by_word(word)
-                if exists:
-                    self.logger.info(f"parse_word(): word {word} already exist")
-                    continue
 
                 t = Translation(
                         word=word,

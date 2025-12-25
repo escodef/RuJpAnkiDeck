@@ -1,7 +1,6 @@
 import os
 import sys
 import logging
-import pykakasi
 
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
@@ -15,8 +14,11 @@ tts_folder = os.getenv("TTS_OUTPUT_FOLDER")
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.database.db_session import init_db
-from shared.database.utils import get_by_word_or_reading
+from shared.database.utils import get_by_word_and_reading, get_by_reading
 from shared.csv.utils import get_words
+from shared.kakashi.utils import get_hiragana
+from shared.regex.utils import has_kanji
+
 
 init_db()
 
@@ -46,24 +48,23 @@ col.models.add_template(model, t2)
 col.models.add(model)
 
 words_to_parse = get_words()
-kks = pykakasi.kakasi()
 
-for index, item in enumerate(words_to_parse[:10]):
+for index, word in enumerate(words_to_parse[:10]):
     end_range = (index // 5000) * 5 + 5
     range_str = f"{end_range}k"
     
     current_deck_id_jp = col.decks.id(f"Слова::Японский - Русский::{range_str}")
     current_deck_id_ru = col.decks.id(f"Слова::Русский - Японский::{range_str}")
 
-    word = item[0]
-    kata = item[2]
-    convert = kks.convert(kata)
     reading = ''
 
-    for item in convert:
-        reading += item['hira']
+    translations = None
+    if has_kanji(word[0]):
+        reading = get_hiragana(word[2])
+        translations = [get_by_word_and_reading(word[0], reading)]
+    else:
+        translations = get_by_reading(reading)
 
-    translations = get_by_word_or_reading(word, reading)
     if not translations:
         logging.warning(f'translations not found for {word}')
         continue

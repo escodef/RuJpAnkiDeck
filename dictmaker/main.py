@@ -16,9 +16,11 @@ from parsers.word_parser import WordParser
 from parsers.gui_word_parser import WordParserGUI
 
 from shared.database.db_session import init_db, SessionLocal
-from shared.database.utils import save_to_sqlite, get_by_index, get_by_word, get_by_reading
+from shared.database.utils import save_to_sqlite, get_by_index, get_by_reading, get_by_word_and_reading
 from shared.csv.utils import get_words
-from utils.re_utils import has_kanji
+from shared.regex.utils import has_kanji
+from shared.kakashi.utils import get_hiragana
+
 
 dict_url = os.getenv("DICT_URL")
 jardic_path = os.getenv("JARDIC_PATH")
@@ -58,10 +60,11 @@ class JapaneseDictionaryParser:
                 break
             try:
                 exists = None
+                reading = get_hiragana(word[2])
                 if has_kanji(word[0]):
-                    exists = get_by_word(word[0])
-                else: 
-                    exists = get_by_reading(word[0])
+                    exists = get_by_word_and_reading(word[0], reading)
+                else:
+                    exists = get_by_reading(reading)
 
                 is_parsed_before = get_by_index(index)
                 if len(is_parsed_before) > 0 or exists:
@@ -99,7 +102,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        dictionary = parser.parse_words(words_to_parse[:2800])
+        dictionary = parser.parse_words(words_to_parse[:3000])
 
         logging.info(f"Parsed words: {len(dictionary)}")
     finally:

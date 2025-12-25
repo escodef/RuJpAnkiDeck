@@ -1,5 +1,7 @@
 from .models import TranslationTable, ExampleTable
 from .db_session import SessionLocal
+from sqlalchemy import Column, Integer, String, ForeignKey
+
 
 def save_to_sqlite(dictionary):
     session = SessionLocal()
@@ -29,7 +31,8 @@ def get_by_word_or_reading(word: str, reading: str) -> list[TranslationTable]:
     session = SessionLocal()
     try:
         result = session.query(TranslationTable).filter(
-            TranslationTable.word == word
+            TranslationTable.word.contains(word),
+            TranslationTable.reading == reading
         ).first()
 
         if result:
@@ -43,6 +46,19 @@ def get_by_word_or_reading(word: str, reading: str) -> list[TranslationTable]:
     finally:
         session.close()
 
+
+def get_by_word_and_reading(word: str, reading: str) -> TranslationTable | None:
+    session = SessionLocal()
+    try:
+        results = session.query(TranslationTable).filter(
+            TranslationTable.word.contains(word),
+            TranslationTable.reading == reading
+        ).first()
+        return results
+    finally:
+        session.close()
+
+
 def get_by_word(word: str) -> TranslationTable | None:
     session = SessionLocal()
     try:
@@ -53,15 +69,17 @@ def get_by_word(word: str) -> TranslationTable | None:
     finally:
         session.close()
 
-def get_by_reading(reading: str) -> TranslationTable | None:
+
+def get_by_reading(reading: str) -> list[TranslationTable]:
     session = SessionLocal()
     try:
         results = session.query(TranslationTable).filter(
             TranslationTable.reading == reading,
-        ).first()
+        ).limit(3).all()
         return results
     finally:
         session.close()
+
 
 def get_by_index(query: int):
     session = SessionLocal()
