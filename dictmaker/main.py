@@ -16,7 +16,7 @@ from parsers.word_parser import WordParser
 from parsers.gui_word_parser import WordParserGUI
 
 from shared.database.db_session import init_db, SessionLocal
-from shared.database.utils import save_to_sqlite, get_by_index, get_by_reading, get_by_word_and_reading
+from shared.database.utils import save_to_sqlite, get_by_index, get_by_reading, get_by_word_and_reading, add_not_found, get_not_found
 from shared.csv.utils import get_words
 from shared.regex.utils import has_kanji
 from shared.kakashi.utils import get_hiragana
@@ -55,26 +55,31 @@ class JapaneseDictionaryParser:
         self.running = False
     
     def parse_words(self, words: List[List[str]]) -> DictionaryList:
-        for index, word in enumerate(words):
+        batch_size = 50
+        for index, wordcsv in enumerate(words):
             if not self.running:
                 break
+            word, _, reading_raw = wordcsv[:3]
             try:
                 exists = None
-                reading = get_hiragana(word[2])
-                if has_kanji(word[0]):
-                    exists = get_by_word_and_reading(word[0], reading)
+                reading = get_hiragana(reading_raw)
+                if has_kanji(word):
+                    exists = get_by_word_and_reading(word, reading)
                 else:
                     exists = get_by_reading(reading)
+                
+                if not exists: 
+                    exists = get_not_found(word, reading_raw)
 
                 is_parsed_before = get_by_index(index)
                 if len(is_parsed_before) > 0 or exists:
                     continue
-                logging.info(f"Parsing word: {word[0]} at index {index}")
+                logging.info(f"Parsing word: {word} at index {index}")
                 
                 if self.is_windows and self.gui_parser:
-                    translations = self.gui_parser.parse_word(word)
+                    translations = self.gui_parser.parse_word(wordcsv)
                 else:
-                    translations = self.parser.parse_word(word)
+                    translations = self.parser.parse_word(wordcsv)
 
                 if translations is None: 
                     continue
@@ -84,16 +89,20 @@ class JapaneseDictionaryParser:
                 for translation in translations:
                     translation.index_csv = index
                     self.dictionary.append(translation)
+
                 if len(translations) == 0:
-                    logging.warning(f"translations len: {len(translations)} for word {word[0]} at index {index}")
+                    logging.warning(f"translations len: {len(translations)} for word {word} at index {index}")
+                    add_not_found(word, reading_raw)
+                
+                if len(self.dictionary) >= batch_size:
+                    save_to_sqlite(self.dictionary)
+                    self.dictionary.clear() 
+                    logging.info("Batch saved to database.")
                 
             except Exception as e:
                 logging.error(f"Error when parsing {word[0]}: {e}")
                 logging.error(traceback.format_exc())
                 continue
-
-        save_to_sqlite(self.dictionary)
-        return self.dictionary
 
 
 def main():
@@ -102,9 +111,9 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        dictionary = parser.parse_words(words_to_parse[:3000])
+        parser.parse_words(words_to_parse[:3000])
 
-        logging.info(f"Parsed words: {len(dictionary)}")
+        logging.info(f"Parsed")
     finally:
         session.close()
         logging.info("Session closed.")

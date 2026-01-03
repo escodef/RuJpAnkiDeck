@@ -49,7 +49,9 @@ col.models.add(model)
 
 words_to_parse = get_words()
 
-for index, word in enumerate(words_to_parse[:10]):
+index = 0
+
+for word in words_to_parse[:10]:
     end_range = (index // 5000) * 5 + 5
     range_str = f"{end_range}k"
     
@@ -70,6 +72,7 @@ for index, word in enumerate(words_to_parse[:10]):
         continue
 
     for translation in translations:
+        index += 1
         word_val = translation.word.replace('\r', '').strip()
         reading = translation.reading.replace('\r\n', '<br>').replace('\n', '<br>').strip()
         mainsense = translation.mainsense.replace('\r\n', '<br>').replace('\n', '<br>').strip()

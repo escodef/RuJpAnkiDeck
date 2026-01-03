@@ -21,3 +21,9 @@ class ExampleTable(Base):
     tr = Column(String)
     translation_id = Column(Integer, ForeignKey('translations.id'))
     translation = relationship("TranslationTable", back_populates="examples")
+
+class NotFoundTable(Base):
+    __tablename__ = 'not_found'
+    id = Column(Integer, primary_key=True)
+    word = Column(String)
+    reading = Column(String)

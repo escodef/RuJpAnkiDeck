@@ -1,6 +1,5 @@
-from .models import TranslationTable, ExampleTable
+from .models import TranslationTable, ExampleTable, NotFoundTable
 from .db_session import SessionLocal
-from sqlalchemy import Column, Integer, String, ForeignKey
 
 
 def save_to_sqlite(dictionary):
@@ -26,6 +25,32 @@ def save_to_sqlite(dictionary):
     finally:
         session.close()
 
+def add_not_found(word, reading):
+    session = SessionLocal()
+    try:
+        db_translation = NotFoundTable(
+            word=word,
+            reading=reading,
+        )
+        session.add(db_translation)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise e
+    finally:
+        session.close()
+
+def get_not_found(word, reading):
+    session = SessionLocal()
+    try:
+        result = session.query(NotFoundTable).filter(
+            NotFoundTable.word == word,
+            NotFoundTable.reading == reading
+        ).first()
+
+        return result
+    finally:
+        session.close()
 
 def get_by_word_or_reading(word: str, reading: str) -> list[TranslationTable]:
     session = SessionLocal()
