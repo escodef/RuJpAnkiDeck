@@ -37,14 +37,13 @@ class WordParserGUI:
     def parse_word(self, wordcsv: List[str]) -> List[Translation] | None:
         word = wordcsv[0]
         kata = wordcsv[2]
-        re = ''
+        reading = ''
         kks = self.kks.convert(kata)
-        ts: List[Translation] = []
 
         for item in kks:
-            re += item['hira']
+            reading += item['hira']
         
-        self.logger.debug(f"Got reading {re}")
+        self.logger.debug(f"Got reading {reading}")
 
         try:
             input_box = self.win.child_window(auto_id="202", control_type="Edit")
@@ -52,28 +51,28 @@ class WordParserGUI:
             self.win.set_focus()
             
             input_box.set_edit_text("")
-            input_box.type_keys(re, with_spaces=True)
+            input_box.type_keys(reading, with_spaces=True)
             time.sleep(0.5)
 
             pane = self.win.child_window(control_id=201)
             table = self.win.child_window(control_id=100)
 
-            last_re = ""
+            last_reading = ""
             while True:
                 pane.set_focus()
                 pane.click_input()
                 send_keys('^a^c')
-                current_re = pyperclip.paste().strip().splitlines()[0]
+                current_reading = pyperclip.paste().strip().splitlines()[0]
 
-                variants = [v.strip() for v in current_re.split('・')]
+                variants = [v.strip() for v in current_reading.split('・')]
                 
-                if current_re == last_re or (re not in variants and kata not in variants):
-                    if re not in variants and kata not in variants:
+                if current_reading == last_reading or (reading not in variants and kata not in variants):
+                    if reading not in variants and kata not in variants:
                         table.set_focus()
                         send_keys('{VK_DOWN}')
                     break
                 
-                last_re = current_re
+                last_reading = current_reading
                 table.set_focus()
                 send_keys('{VK_UP}')
                 time.sleep(0.1)
@@ -85,11 +84,11 @@ class WordParserGUI:
                 pane.click_input()
                 send_keys('^a^c')
                 current_text = pyperclip.paste().strip()
-                current_re = current_text.splitlines()[0]
-                variants = [v.strip() for v in current_re.split('・')]
+                current_reading = current_text.splitlines()[0]
+                variants = [v.strip() for v in current_reading.split('・')]
                 self.logger.debug(f"Variants {variants}")
 
-                if current_text == last_text or (re not in variants and kata not in variants):
+                if current_text == last_text or (reading not in variants and kata not in variants):
                     break
 
                 dot_count = current_text.splitlines()[1].count("・")
@@ -102,41 +101,47 @@ class WordParserGUI:
                     send_keys('{VK_DOWN}')
                 time.sleep(0.1)
 
-
-            for entry in results:
-                sents = entry.split('\n')
-                strip = 1
-
-                if not has_cyrillic(sents[1]):
-                    word = sents[1]
-                    strip = 2
-
-                senses = "\n".join(sents[strip:]).strip()
-                
-                mainsense = self.get_mainsense(senses)
-
-                t = Translation(
-                        word=word,
-                        reading=re,
-                        mainsense=mainsense,
-                        senses=senses
-                    )
-                
-                ts.append(t)
-
-            return ts
+            return self.process_raw_text(results)
 
         except Exception as e:
             self.logger.error(f"parse_word(): {e}")
             return None
 
+
+    def process_results(self, results: list[str]) -> List[Translation]:
+        ts: List[Translation] = []
+        for entry in results:
+            entry = entry.replace('\r', '')
+            sents = entry.split('\n')
+            strip = 1
+            reading = entry.splitlines()[0]
+
+            if not has_cyrillic(sents[1]):
+                word = sents[1]
+                strip = 2
+            else:
+                word = reading
+
+            senses = "\n".join(sents[strip:]).strip()
+            
+            mainsense = self.get_mainsense(senses)
+
+            t = Translation(
+                    word=word,
+                    reading=reading,
+                    mainsense=mainsense,
+                    senses=senses
+                )
+            
+            ts.append(t)
+
+        return ts
+       
+
     def get_mainsense(self, article: str) -> str:
-        processed_result = ''
-
-        if re.search(r'^\d+\.', article.strip(), re.MULTILINE):
-            items = re.findall(r'\d+\.\s*([^;\n]+)', article)
-            processed_result = items[0] 
-        else:
-            processed_result = article.split(';')[0].strip()
-
-        return processed_result
+        match = re.search(r'\d+[.)]\s*([^;:\n]+)', article)
+        
+        if match:
+            return match.group(1).strip()
+        
+        return article.split(';')[0].strip()

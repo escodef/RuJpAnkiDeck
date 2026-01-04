@@ -1,0 +1,137 @@
+import pytest
+
+from parsers.gui_word_parser import WordParserGUI
+from models.models import Translation
+
+
+@pytest.fixture
+def parser():
+    obj = WordParserGUI.__new__(WordParserGUI)
+    return obj
+
+
+def test_basic_article_ra(parser):
+    test_articles_ra = ["""…ら
+…等
+суф. мн. числа; после имени собств. и другие; и его друзья (сторонники); и иже с ним, и его присные; и сопровождающие его лица.
+"""]
+
+    results = parser.process_results(test_articles_ra)
+    
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "…等"
+    assert first_res.reading == "…ら"
+    assert first_res.mainsense == 'суф. мн. числа'
+
+
+def test_basic_article_hani(parser):
+    test_articles_hani = ["""はんい
+範囲
+сфера, область, круг; диапазон; радиус [действий]; предел;
+我々の範囲では в нашем кругу;
+私の知る範囲では насколько мне известно;
+範囲を限る ставить [определённые] рамки чему-л., ограничивать пределы чего-л.;
+人智の範囲を越える быть за пределами человеческих знаний;
+彼の読書の範囲は広い круг (диапазон) его чтения широк."""]
+
+    results = parser.process_results(test_articles_hani)
+    
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "範囲"
+    assert first_res.reading == "はんい"
+    assert first_res.mainsense == "сфера, область, круг"
+
+
+def test_basic_article_shindan(parser):
+    test_articles = ["""しんだん
+診断
+диагноз;
+～する, 診断を下す ставить диагноз;
+医者には診断がつかなかった врач не мог поставить диагноза."""]
+
+    results = parser.process_results(test_articles)
+    
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "診断"
+    assert first_res.reading == "しんだん"
+    assert first_res.mainsense == "диагноз"
+
+
+def test_list_article_beshi(parser):
+    test_articles = ["""べし
+可し
+1. нужно, следует (делать и т.п.)
+2. должно быть, вероятно"""]
+
+    results = parser.process_results(test_articles)
+    
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "可し"
+    assert first_res.reading == "べし"
+    assert first_res.mainsense == "нужно, следует (делать и т.п.)"
+
+def test_list_article_tokoro(parser):
+    test_articles = ["""ところ
+所I･処
+сущ.
+1) место;
+…～にある находиться где-л.;
+…する所がない негде сделать что-л.;
+所かまわず безразлично где (в каком месте), в любом месте;
+所によって異なる различаться в зависимости от места (от того, где находится);
+彼の行っている所が分からない я не знаю, куда он ушёл (уехал); я не знаю, где он;
+人のいる所 в присутствии людей; при людях;
+その町は海抜二千フィートの所にある этот город расположен на высоте 2000 футов над уровнем моря;
+2) [определённое] место;
+所を得る быть на [своём] месте;
+物には所がある всему своё место;
+3) местожительство; чей-л. дом;
+所を教える объяснять, где живёшь, давать свой адрес;
+私の所に у меня [дома];
+伊東の所に行く пойти к г-ну Ито́;
+伊東さんの所のお嬢さん дочь г-на Ито́;
+おじの所にいる жить у дяди;
+ぼくの所は家族が多い у меня большая семья;
+4) перен. место, сторона; черты;
+弱い所 слабое место, слабая сторона;
+いい所がある есть положительные стороны (моменты);
+彼らは見る所が異なる у них разные точки зрения, они смотрят с разных точек зрения;
+5) кое-что, что-то; то что;
+君の言う所 то, что ты говоришь;
+それが私の望む所だ вот чего мне хочется, вот на что я надеюсь;
+この事にもっともらしい所もある в этом есть кое-что правдоподобное;
+彼は学者らしい所がある в нём есть что-то от учёного;
+彼女には女らしい所がない в ней нет ничего женственного;
+…は周知の所である что-л. общеизвестно; общеизвестно, что…;
+君の知る所ではない это не твоё дело;
+私の見た所では по тому, что я видел…; насколько я видел;
+私の知っている所で насколько мне известно, насколько я знаю."""]
+
+    results = parser.process_results(test_articles)
+    
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "所I･処"
+    assert first_res.reading == "ところ"
+    assert first_res.mainsense == "место"
+
+
+def test_list_article_dzukuri(parser):
+    test_articles = ["""…づくり
+…造り
+построенный из чего-л.;
+煉瓦造りの кирпичный."""]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "…造り"
+    assert first_res.reading == "…づくり"
+    assert first_res.mainsense == "построенный из чего-л."
+    assert first_res.senses == """построенный из чего-л.;
+煉瓦造りの кирпичный."""

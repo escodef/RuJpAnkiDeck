@@ -53,11 +53,12 @@ class JapaneseDictionaryParser:
     def _handle_exit(self, signum, frame):
         logging.info("Gracefully shutting down...")
         self.running = False
-    
+
     def parse_words(self, words: List[List[str]]) -> DictionaryList:
         batch_size = 50
         for index, wordcsv in enumerate(words):
             if not self.running:
+                save_to_sqlite(self.dictionary)
                 break
             word, _, reading_raw = wordcsv[:3]
             try:
@@ -84,11 +85,16 @@ class JapaneseDictionaryParser:
                 if translations is None: 
                     continue
 
-                logging.info(translations)
+                logging.info(f"found translations: {translations}")
                 
                 for translation in translations:
-                    translation.index_csv = index
-                    self.dictionary.append(translation)
+                    is_duplicate_in_batch = any(t.word == translation.word for t in self.dictionary)
+                    if not is_duplicate_in_batch:
+                        translation.index_csv = index
+                        self.dictionary.append(translation)
+                    else:
+                        logging.warning(f"found dup translation: {translation} for word {word} at index {index}")
+
 
                 if len(translations) == 0:
                     logging.warning(f"translations len: {len(translations)} for word {word} at index {index}")
