@@ -183,6 +183,23 @@ def test_list_article_mame(parser):
     )
 
 
+def test_list_article_jun(parser):
+    test_articles = [
+        """じゅん　　　
+純
+1): ～な чистый, незапятнанный;
+2): ～[な] чистый, беспримесный, без примеси."""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "純"
+    assert first_res.reading == "じゅん"
+    assert first_res.mainsense == "～な чистый, незапятнанный"
+
+
 def test_date_chouwa(parser):
     test_articles = [
         """ちょうわ　　
@@ -245,3 +262,37 @@ def test_colon_shoukei(parser):
     assert first_res.word == "小慧"
     assert first_res.reading == "しょうけい"
     assert first_res.mainsense == "～の кн. толковый, смышлёный."
+
+
+def test_nonstandard_boudai(parser):
+    test_articles = [
+        """ぼうだい　　
+厖大
+неправ. 尨大
+: ～な огромный, громадный;
+厖大な本 объёмистая книга."""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "厖大"
+    assert first_res.reading == "ぼうだい"
+    assert first_res.mainsense == "～な огромный, громадный"
+
+
+def test_nonstandard_kakaru(parser):
+    test_articles = [
+        """かかる
+как 2-ой компонент сложн. гл. указывает на начало и незаконченность действия:
+начинается..., вот-вот..., почти..., чуть не..."""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "かかる"
+    assert first_res.reading == "かかる"
+    assert first_res.mainsense == "начинается..., вот-вот..., почти..., чуть не..."
