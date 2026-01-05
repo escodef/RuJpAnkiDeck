@@ -11,32 +11,36 @@ def parser():
 
 
 def test_basic_article_ra(parser):
-    test_articles_ra = ["""…ら
+    test_articles_ra = [
+        """…ら
 …等
 суф. мн. числа; после имени собств. и другие; и его друзья (сторонники); и иже с ним, и его присные; и сопровождающие его лица.
-"""]
+"""
+    ]
 
     results = parser.process_results(test_articles_ra)
-    
+
     first_res = results[0]
     assert isinstance(first_res, Translation)
     assert first_res.word == "…等"
     assert first_res.reading == "…ら"
-    assert first_res.mainsense == 'суф. мн. числа'
+    assert first_res.mainsense == "суф. мн. числа"
 
 
 def test_basic_article_hani(parser):
-    test_articles_hani = ["""はんい
+    test_articles_hani = [
+        """はんい
 範囲
 сфера, область, круг; диапазон; радиус [действий]; предел;
 我々の範囲では в нашем кругу;
 私の知る範囲では насколько мне известно;
 範囲を限る ставить [определённые] рамки чему-л., ограничивать пределы чего-л.;
 人智の範囲を越える быть за пределами человеческих знаний;
-彼の読書の範囲は広い круг (диапазон) его чтения широк."""]
+彼の読書の範囲は広い круг (диапазон) его чтения широк."""
+    ]
 
     results = parser.process_results(test_articles_hani)
-    
+
     first_res = results[0]
     assert isinstance(first_res, Translation)
     assert first_res.word == "範囲"
@@ -45,14 +49,16 @@ def test_basic_article_hani(parser):
 
 
 def test_basic_article_shindan(parser):
-    test_articles = ["""しんだん
+    test_articles = [
+        """しんだん
 診断
 диагноз;
 ～する, 診断を下す ставить диагноз;
-医者には診断がつかなかった врач не мог поставить диагноза."""]
+医者には診断がつかなかった врач не мог поставить диагноза."""
+    ]
 
     results = parser.process_results(test_articles)
-    
+
     first_res = results[0]
     assert isinstance(first_res, Translation)
     assert first_res.word == "診断"
@@ -61,21 +67,25 @@ def test_basic_article_shindan(parser):
 
 
 def test_list_article_beshi(parser):
-    test_articles = ["""べし
+    test_articles = [
+        """べし
 可し
 1. нужно, следует (делать и т.п.)
-2. должно быть, вероятно"""]
+2. должно быть, вероятно"""
+    ]
 
     results = parser.process_results(test_articles)
-    
+
     first_res = results[0]
     assert isinstance(first_res, Translation)
     assert first_res.word == "可し"
     assert first_res.reading == "べし"
     assert first_res.mainsense == "нужно, следует (делать и т.п.)"
 
+
 def test_list_article_tokoro(parser):
-    test_articles = ["""ところ
+    test_articles = [
+        """ところ
 所I･処
 сущ.
 1) место;
@@ -109,10 +119,11 @@ def test_list_article_tokoro(parser):
 …は周知の所である что-л. общеизвестно; общеизвестно, что…;
 君の知る所ではない это не твоё дело;
 私の見た所では по тому, что я видел…; насколько я видел;
-私の知っている所で насколько мне известно, насколько я знаю."""]
+私の知っている所で насколько мне известно, насколько я знаю."""
+    ]
 
     results = parser.process_results(test_articles)
-    
+
     first_res = results[0]
     assert isinstance(first_res, Translation)
     assert first_res.word == "所I･処"
@@ -121,10 +132,12 @@ def test_list_article_tokoro(parser):
 
 
 def test_list_article_dzukuri(parser):
-    test_articles = ["""…づくり
+    test_articles = [
+        """…づくり
 …造り
 построенный из чего-л.;
-煉瓦造りの кирпичный."""]
+煉瓦造りの кирпичный."""
+    ]
 
     results = parser.process_results(test_articles)
 
@@ -133,5 +146,61 @@ def test_list_article_dzukuri(parser):
     assert first_res.word == "…造り"
     assert first_res.reading == "…づくり"
     assert first_res.mainsense == "построенный из чего-л."
-    assert first_res.senses == """построенный из чего-л.;
+    assert (
+        first_res.senses
+        == """построенный из чего-л.;
 煉瓦造りの кирпичный."""
+    )
+
+
+def test_list_article_mame(parser):
+    test_articles = [
+        """まめ　　　　
+まめ･忠実
+1): ～な честный, преданный;
+まめに勤める честно служить;
+2): ～な старательный, усердный;
+まめに働く усердно работать;
+3): ～な здоровый;
+まめである, まめで暮らしている быть здоровым."""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "まめ･忠実"
+    assert first_res.reading == "まめ"
+    assert first_res.mainsense == "～な честный, преданный"
+
+
+def test_date_chouwa(parser):
+    test_articles = [
+        """ちょうわ　　
+長和
+1012.XII — 1017.IV"""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "長和"
+    assert first_res.reading == "ちょうわ"
+    assert first_res.mainsense == "1012.XII — 1017.IV"
+    assert first_res.senses == "1012.XII — 1017.IV"
+
+
+def test_recursive_articles(parser):
+    test_articles = [
+        """つく　　　　
+木菟･木兎
+уст. см. <<みみずく>>.""",
+        """かくしん　　
+閣臣
+уст. см. <<こくむだいじん>>.""",
+    ]
+
+    results = parser.process_results(test_articles)
+
+    assert len(results) == 0

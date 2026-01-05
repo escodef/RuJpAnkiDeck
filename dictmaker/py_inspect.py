@@ -13,17 +13,17 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QTreeView
 from PyQt5.QtWidgets import QTableView
+from pywinauto import backend
 import sys
 import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 sys.coinit_flags = 2
-from pywinauto import backend
 
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyle('Fusion')
+    app.setStyle("Fusion")
 
     w = MyWindow()
     w.show()
@@ -36,10 +36,9 @@ class MyWindow(QWidget):
 
         self.setMinimumSize(1000, 1000)
         self.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
-        self.setWindowTitle(
-            QCoreApplication.translate("MainWindow", "PyInspect"))
+        self.setWindowTitle(QCoreApplication.translate("MainWindow", "PyInspect"))
 
-        self.settings = QSettings('py_inspect', 'MainWindow')
+        self.settings = QSettings("py_inspect", "MainWindow")
 
         # Main layout
         self.mainLayout = QGridLayout()
@@ -63,7 +62,7 @@ class MyWindow(QWidget):
         self.tree_view = QTreeView()
         self.tree_view.setColumnWidth(0, 150)
 
-        self.comboBox.setCurrentText('uia')
+        self.comboBox.setCurrentText("uia")
         self.__initialize_calc()
 
         self.table_view = QTableView()
@@ -75,23 +74,23 @@ class MyWindow(QWidget):
         self.mainLayout.addWidget(self.table_view, 1, 1, 1, 1)
 
         self.setLayout(self.mainLayout)
-        geometry = self.settings.value('Geometry', bytes('', 'utf-8'))
+        geometry = self.settings.value("Geometry", bytes("", "utf-8"))
         self.restoreGeometry(geometry)
 
     if sys.platform.startswith("linux"):
-        def __initialize_calc(self, _backend='atspi'):
-            self.element_info \
-                = backend.registry.backends[_backend].element_info_class()
+
+        def __initialize_calc(self, _backend="atspi"):
+            self.element_info = backend.registry.backends[_backend].element_info_class()
             self.tree_model = MyTreeModel(self.element_info, _backend)
-            self.tree_model.setHeaderData(0, Qt.Horizontal, 'Controls')
+            self.tree_model.setHeaderData(0, Qt.Horizontal, "Controls")
             self.tree_view.setModel(self.tree_model)
             self.tree_view.clicked.connect(self.__show_property)
     else:
-        def __initialize_calc(self, _backend='uia'):
-            self.element_info \
-                = backend.registry.backends[_backend].element_info_class()
+
+        def __initialize_calc(self, _backend="uia"):
+            self.element_info = backend.registry.backends[_backend].element_info_class()
             self.tree_model = MyTreeModel(self.element_info, _backend)
-            self.tree_model.setHeaderData(0, Qt.Horizontal, 'Controls')
+            self.tree_model.setHeaderData(0, Qt.Horizontal, "Controls")
             self.tree_view.setModel(self.tree_model)
             self.tree_view.clicked.connect(self.__show_property)
 
@@ -101,15 +100,14 @@ class MyWindow(QWidget):
 
     def __show_property(self, index=None):
         data = index.data()
-        self.table_model \
-            = MyTableModel(self.tree_model.props_dict.get(data), self)
+        self.table_model = MyTableModel(self.tree_model.props_dict.get(data), self)
         self.table_view.wordWrap()
         self.table_view.setModel(self.table_model)
         self.table_view.setColumnWidth(1, 320)
 
     def closeEvent(self, event):
         geometry = self.saveGeometry()
-        self.settings.setValue('Geometry', geometry)
+        self.settings.setValue("Geometry", geometry)
         super(MyWindow, self).closeEvent(event)
 
 
@@ -128,51 +126,61 @@ class MyTreeModel(QStandardItemModel):
     def __get_next(self, element_info, parent):
         for child in element_info.children():
             self.__generate_props_dict(child)
-            child_item \
-                = QStandardItem(self.__node_name(child))
+            child_item = QStandardItem(self.__node_name(child))
             child_item.setEditable(False)
             parent.appendRow(child_item)
             self.__get_next(child, child_item)
 
     def __node_name(self, element_info):
-        if 'uia' == self.backend:
-            return '%s "%s" (%s)' % (str(element_info.control_type),
-                                     str(element_info.name),
-                                     id(element_info))
-        elif 'atspi' == self.backend:
-            return '%s "%s" (%s)' % (str(element_info.control_type),
-                                     str(element_info.name),
-                                     id(element_info))
+        if "uia" == self.backend:
+            return '%s "%s" (%s)' % (
+                str(element_info.control_type),
+                str(element_info.name),
+                id(element_info),
+            )
+        elif "atspi" == self.backend:
+            return '%s "%s" (%s)' % (
+                str(element_info.control_type),
+                str(element_info.name),
+                id(element_info),
+            )
         return '"%s" (%s)' % (str(element_info.name), id(element_info))
 
     def __generate_props_dict(self, element_info):
         props = [
-                    ['control_id', str(element_info.control_id)],
-                    ['class_name', str(element_info.class_name)],
-                    ['enabled', str(element_info.enabled)],
-                    ['handle', str(element_info.handle)],
-                    ['name', str(element_info.name)],
-                    ['process_id', str(element_info.process_id)],
-                    ['rectangle', str(element_info.rectangle)],
-                    ['rich_text', str(element_info.rich_text)],
-                    ['visible', str(element_info.visible)]
-                ]
+            ["control_id", str(element_info.control_id)],
+            ["class_name", str(element_info.class_name)],
+            ["enabled", str(element_info.enabled)],
+            ["handle", str(element_info.handle)],
+            ["name", str(element_info.name)],
+            ["process_id", str(element_info.process_id)],
+            ["rectangle", str(element_info.rectangle)],
+            ["rich_text", str(element_info.rich_text)],
+            ["visible", str(element_info.visible)],
+        ]
 
-        props_win32 = [
-                      ] if (self.backend == 'win32') else []
+        props_win32 = [] if (self.backend == "win32") else []
 
-        props_uia = [
-                        ['automation_id', str(element_info.automation_id)],
-                        ['control_type', str(element_info.control_type)],
-                        ['element', str(element_info.element)],
-                        ['framework_id', str(element_info.framework_id)],
-                        ['runtime_id', str(element_info.runtime_id)]
-                    ] if (self.backend == 'uia') else []
+        props_uia = (
+            [
+                ["automation_id", str(element_info.automation_id)],
+                ["control_type", str(element_info.control_type)],
+                ["element", str(element_info.element)],
+                ["framework_id", str(element_info.framework_id)],
+                ["runtime_id", str(element_info.runtime_id)],
+            ]
+            if (self.backend == "uia")
+            else []
+        )
 
-        props_atspi = [
-                        ['control_type', str(element_info.control_type)],
-                        ['runtime_id', str(element_info.runtime_id)]
-                    ] if (self.backend == 'atspi') else []
+        props_atspi = (
+            [
+                ["control_type", str(element_info.control_type)],
+                ["runtime_id", str(element_info.runtime_id)],
+            ]
+            if (self.backend == "atspi")
+            else []
+        )
 
         props.extend(props_uia)
         props.extend(props_win32)
@@ -185,7 +193,7 @@ class MyTableModel(QAbstractTableModel):
     def __init__(self, datain, parent=None, *args):
         QAbstractTableModel.__init__(self, parent, *args)
         self.arraydata = datain
-        self.header_labels = ['Property', 'Value']
+        self.header_labels = ["Property", "Value"]
 
     def rowCount(self, parent):
         return len(self.arraydata)

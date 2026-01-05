@@ -1,6 +1,6 @@
 from .models import TranslationTable, ExampleTable, NotFoundTable
 from .db_session import SessionLocal
-
+from sqlalchemy import or_
 
 def save_to_sqlite(dictionary):
     session = SessionLocal()
@@ -98,8 +98,23 @@ def get_by_word(word: str) -> TranslationTable | None:
 def get_by_reading(reading: str) -> list[TranslationTable]:
     session = SessionLocal()
     try:
+        pattern_start = f"{reading}・%"
+        pattern_end = f"%・{reading}"
+        pattern_middle = f"%・{reading}・%"
+        pattern_start_spaced = f"{reading} ・%"
+        pattern_end_spaced = f"%・ {reading}"
+        pattern_middle_spaced = f"%・ {reading} ・%"
+
         results = session.query(TranslationTable).filter(
-            TranslationTable.reading == reading,
+            or_(
+                TranslationTable.reading == reading,
+                TranslationTable.reading.like(pattern_start),
+                TranslationTable.reading.like(pattern_end),
+                TranslationTable.reading.like(pattern_middle),
+                TranslationTable.reading.like(pattern_start_spaced),
+                TranslationTable.reading.like(pattern_end_spaced),
+                TranslationTable.reading.like(pattern_middle_spaced)
+            )
         ).limit(3).all()
         return results
     finally:

@@ -34,16 +34,16 @@ col.models.add_field(model, col.models.new_field("Reading"))
 col.models.add_field(model, col.models.new_field("MainSense"))
 col.models.add_field(model, col.models.new_field("Senses"))
 
-model['css'] = CARD_CSS
+model["css"] = CARD_CSS
 
-t1 = col.models.new_template("JP -> RU")
-t1['qfmt'] = JP_RU_FRONT
-t1['afmt'] = JP_RU_BACK
+t1 = col.models.new_template("JP - RU")
+t1["qfmt"] = JP_RU_FRONT
+t1["afmt"] = JP_RU_BACK
 col.models.add_template(model, t1)
 
-t2 = col.models.new_template("RU -> JP")
-t2['qfmt'] = RU_JP_FRONT
-t2['afmt'] = RU_JP_BACK
+t2 = col.models.new_template("RU - JP")
+t2["qfmt"] = RU_JP_FRONT
+t2["afmt"] = RU_JP_BACK
 col.models.add_template(model, t2)
 col.models.add(model)
 
@@ -54,11 +54,11 @@ index = 0
 for word in words_to_parse[:10]:
     end_range = (index // 5000) * 5 + 5
     range_str = f"{end_range}k"
-    
+
     current_deck_id_jp = col.decks.id(f"Слова::Японский - Русский::{range_str}")
     current_deck_id_ru = col.decks.id(f"Слова::Русский - Японский::{range_str}")
 
-    reading = ''
+    reading = ""
 
     translations = None
     if has_kanji(word[0]):
@@ -68,28 +68,34 @@ for word in words_to_parse[:10]:
         translations = get_by_reading(reading)
 
     if not translations:
-        logging.warning(f'translations not found for {word}')
+        logging.warning(f"translations not found for {word}")
         continue
 
     for translation in translations:
         index += 1
-        word_val = translation.word.replace('\r', '').strip()
-        reading = translation.reading.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-        mainsense = translation.mainsense.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-        senses = translation.senses.replace('\r\n', '<br>').replace('\n', '<br>').strip()
-        
+        word_val = translation.word.replace("\r", "").strip()
+        reading = (
+            translation.reading.replace("\r\n", "<br>").replace("\n", "<br>").strip()
+        )
+        mainsense = (
+            translation.mainsense.replace("\r\n", "<br>").replace("\n", "<br>").strip()
+        )
+        senses = (
+            translation.senses.replace("\r\n", "<br>").replace("\n", "<br>").strip()
+        )
+
         note = col.new_note(model)
-        note['Word'] = word_val
-        note['Reading'] = reading
-        note['MainSense'] = mainsense
-        note['Senses'] = senses
+        note["Word"] = word_val
+        note["Reading"] = reading
+        note["MainSense"] = mainsense
+        note["Senses"] = senses
 
         audio_filename = f"{word}.wav"
         audio_path = os.path.join(tts_folder, audio_filename)
 
         if os.path.exists(audio_path):
             col.media.add_file(audio_path)
-            note['Reading'] += f" [sound:{audio_filename}]"
+            note["Reading"] += f" [sound:{audio_filename}]"
 
         col.add_note(note, current_deck_id_jp)
 
