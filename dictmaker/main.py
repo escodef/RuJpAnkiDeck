@@ -4,6 +4,7 @@ import logging
 import traceback
 import signal
 from dotenv import load_dotenv
+
 load_dotenv()
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(root_path)
@@ -115,7 +116,6 @@ class JapaneseDictionaryParser:
                     save_to_sqlite(self.dictionary)
                     self.dictionary.clear()
                     logging.info("Batch saved to database.")
-            
 
             except Exception as e:
                 logging.error(f"Error when parsing {word[0]}: {e}")

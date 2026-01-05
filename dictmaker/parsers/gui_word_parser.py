@@ -8,7 +8,7 @@ from typing import List
 from pywinauto import Desktop, Application
 from models.models import Translation
 from pywinauto.keyboard import send_keys
-from shared.regex.utils import has_cyrillic
+from shared.regex.utils import has_cyrillic, has_kanji
 
 
 class WordParserGUI:
@@ -33,6 +33,7 @@ class WordParserGUI:
         time.sleep(0.5)
 
     def parse_word(self, wordcsv: List[str]) -> List[Translation] | None:
+        word = wordcsv[0]
         kata = wordcsv[2]
         reading = ""
         kks = self.kks.convert(kata)
@@ -44,11 +45,17 @@ class WordParserGUI:
 
         try:
             input_box = self.win.child_window(auto_id="202", control_type="Edit")
-            self.switch_tab(1)
+            input_box.set_edit_text("")
+
+            if has_kanji(word):
+                self.switch_tab(2)
+                input_box.type_keys(word, with_spaces=True)
+            else:        
+                self.switch_tab(1)
+                input_box.type_keys(reading, with_spaces=True)
+
             self.win.set_focus()
 
-            input_box.set_edit_text("")
-            input_box.type_keys(reading, with_spaces=True)
             time.sleep(0.5)
 
             pane = self.win.child_window(control_id=201)

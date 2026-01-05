@@ -2,6 +2,7 @@ from .models import TranslationTable, ExampleTable, NotFoundTable
 from .db_session import SessionLocal
 from sqlalchemy import or_
 
+
 def save_to_sqlite(dictionary):
     session = SessionLocal()
     try:
@@ -11,7 +12,7 @@ def save_to_sqlite(dictionary):
                 reading=item.reading,
                 mainsense=item.mainsense,
                 senses=item.senses,
-                index_csv=item.index_csv
+                index_csv=item.index_csv,
             )
             for ex in item.examples:
                 db_translation.examples.append(
@@ -24,6 +25,7 @@ def save_to_sqlite(dictionary):
         raise e
     finally:
         session.close()
+
 
 def add_not_found(word, reading):
     session = SessionLocal()
@@ -40,33 +42,43 @@ def add_not_found(word, reading):
     finally:
         session.close()
 
+
 def get_not_found(word, reading):
     session = SessionLocal()
     try:
-        result = session.query(NotFoundTable).filter(
-            NotFoundTable.word == word,
-            NotFoundTable.reading == reading
-        ).first()
+        result = (
+            session.query(NotFoundTable)
+            .filter(NotFoundTable.word == word, NotFoundTable.reading == reading)
+            .first()
+        )
 
         return result
     finally:
         session.close()
 
-def get_by_word_or_reading(word: str, reading: str) -> list[TranslationTable]:
+
+def get_by_word_or_reading(word: str, reading: str, limit=3) -> list[TranslationTable]:
     session = SessionLocal()
     try:
-        result = session.query(TranslationTable).filter(
-            TranslationTable.word.contains(word),
-            TranslationTable.reading == reading
-        ).first()
+        result = (
+            session.query(TranslationTable)
+            .filter(
+                TranslationTable.word.contains(word),
+                TranslationTable.reading == reading,
+            )
+            .first()
+        )
 
         if result:
             return [result]
 
-        results = session.query(TranslationTable).filter(
-            TranslationTable.reading == reading
-        ).limit(3).all()
-        
+        results = (
+            session.query(TranslationTable)
+            .filter(TranslationTable.reading == reading)
+            .limit(limit)
+            .all()
+        )
+
         return results
     finally:
         session.close()
@@ -75,10 +87,14 @@ def get_by_word_or_reading(word: str, reading: str) -> list[TranslationTable]:
 def get_by_word_and_reading(word: str, reading: str) -> TranslationTable | None:
     session = SessionLocal()
     try:
-        results = session.query(TranslationTable).filter(
-            TranslationTable.word.contains(word),
-            TranslationTable.reading == reading
-        ).first()
+        results = (
+            session.query(TranslationTable)
+            .filter(
+                TranslationTable.word.contains(word),
+                TranslationTable.reading == reading,
+            )
+            .first()
+        )
         return results
     finally:
         session.close()
@@ -87,15 +103,19 @@ def get_by_word_and_reading(word: str, reading: str) -> TranslationTable | None:
 def get_by_word(word: str) -> TranslationTable | None:
     session = SessionLocal()
     try:
-        results = session.query(TranslationTable).filter(
-            TranslationTable.word == word,
-        ).first()
+        results = (
+            session.query(TranslationTable)
+            .filter(
+                TranslationTable.word == word,
+            )
+            .first()
+        )
         return results
     finally:
         session.close()
 
 
-def get_by_reading(reading: str) -> list[TranslationTable]:
+def get_by_reading(reading: str, limit=3) -> list[TranslationTable]:
     session = SessionLocal()
     try:
         pattern_start = f"{reading}・%"
@@ -105,17 +125,22 @@ def get_by_reading(reading: str) -> list[TranslationTable]:
         pattern_end_spaced = f"%・ {reading}"
         pattern_middle_spaced = f"%・ {reading} ・%"
 
-        results = session.query(TranslationTable).filter(
-            or_(
-                TranslationTable.reading == reading,
-                TranslationTable.reading.like(pattern_start),
-                TranslationTable.reading.like(pattern_end),
-                TranslationTable.reading.like(pattern_middle),
-                TranslationTable.reading.like(pattern_start_spaced),
-                TranslationTable.reading.like(pattern_end_spaced),
-                TranslationTable.reading.like(pattern_middle_spaced)
+        results = (
+            session.query(TranslationTable)
+            .filter(
+                or_(
+                    TranslationTable.reading == reading,
+                    TranslationTable.reading.like(pattern_start),
+                    TranslationTable.reading.like(pattern_end),
+                    TranslationTable.reading.like(pattern_middle),
+                    TranslationTable.reading.like(pattern_start_spaced),
+                    TranslationTable.reading.like(pattern_end_spaced),
+                    TranslationTable.reading.like(pattern_middle_spaced),
+                )
             )
-        ).limit(3).all()
+            .limit(limit)
+            .all()
+        )
         return results
     finally:
         session.close()
@@ -124,9 +149,11 @@ def get_by_reading(reading: str) -> list[TranslationTable]:
 def get_by_index(query: int):
     session = SessionLocal()
     try:
-        results = session.query(TranslationTable).filter(
-            TranslationTable.index_csv == query 
-        ).all()
+        results = (
+            session.query(TranslationTable)
+            .filter(TranslationTable.index_csv == query)
+            .all()
+        )
         return results
     finally:
         session.close()
