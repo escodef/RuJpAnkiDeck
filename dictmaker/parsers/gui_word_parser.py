@@ -146,4 +146,7 @@ class WordParserGUI:
         if match:
             return match.group(1).strip()
 
-        return article.split(";")[0].strip()
+        part = article.split(";")[0]
+        result = part.partition(":")[-1].strip() or part.strip()
+
+        return result

@@ -213,3 +213,35 @@ def test_recursive_articles(parser):
     results = parser.process_results(test_articles)
 
     assert len(results) == 0
+
+
+def test_colon_kaikan(parser):
+    test_articles = [
+        """かいかん　　
+開罐･開缶
+: ～する открывать банку (напр. консервов)."""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "開罐･開缶"
+    assert first_res.reading == "かいかん"
+    assert first_res.mainsense == "～する открывать банку (напр. консервов)."
+
+
+def test_colon_shoukei(parser):
+    test_articles = [
+        """しょうけい　
+小慧
+: ～の кн. толковый, смышлёный."""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "小慧"
+    assert first_res.reading == "しょうけい"
+    assert first_res.mainsense == "～の кн. толковый, смышлёный."
