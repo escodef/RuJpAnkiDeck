@@ -172,6 +172,15 @@ def test_list_article_mame(parser):
     assert first_res.word == "まめ･忠実"
     assert first_res.reading == "まめ"
     assert first_res.mainsense == "～な честный, преданный"
+    assert (
+        first_res.senses
+        == """1): ～な честный, преданный;
+まめに勤める честно служить;
+2): ～な старательный, усердный;
+まめに働く усердно работать;
+3): ～な здоровый;
+まめである, まめで暮らしている быть здоровым."""
+    )
 
 
 def test_date_chouwa(parser):
@@ -195,7 +204,7 @@ def test_recursive_articles(parser):
     test_articles = [
         """つく　　　　
 木菟･木兎
-уст. см. <<みみずく>>.""",
+см. <<みみずく>>.""",
         """かくしん　　
 閣臣
 уст. см. <<こくむだいじん>>.""",
