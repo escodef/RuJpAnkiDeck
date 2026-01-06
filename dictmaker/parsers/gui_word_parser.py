@@ -35,13 +35,6 @@ class WordParserGUI:
     def parse_word(self, wordcsv: List[str]) -> List[Translation] | None:
         word = wordcsv[0]
         kata = wordcsv[2]
-        reading = ""
-        kks = self.kks.convert(kata)
-
-        for item in kks:
-            reading += item["hira"]
-
-        self.logger.debug(f"Got reading {reading}")
 
         try:
             input_box = self.win.child_window(auto_id="202", control_type="Edit")
@@ -50,9 +43,9 @@ class WordParserGUI:
             if has_kanji(word):
                 self.switch_tab(2)
                 input_box.type_keys(word, with_spaces=True)
-            else:        
+            else:
                 self.switch_tab(1)
-                input_box.type_keys(reading, with_spaces=True)
+                input_box.type_keys(word, with_spaces=True)
 
             self.win.set_focus()
 
@@ -61,48 +54,51 @@ class WordParserGUI:
             pane = self.win.child_window(control_id=201)
             table = self.win.child_window(control_id=100)
 
-            last_reading = ""
+            last_article = ""
             while True:
                 pane.set_focus()
-                pane.click_input()
+                pane.wait("ready", timeout=10)
+
                 send_keys("^a^c")
-                current_reading = pyperclip.paste().strip().splitlines()[0]
+                current_article = pyperclip.paste().strip()
 
-                variants = [v.strip() for v in current_reading.split("・")]
+                is_article_correct = self.is_article_correct(
+                    current_article, word, kata
+                )
+                table.set_focus()
 
-                if current_reading == last_reading or (
-                    reading not in variants and kata not in variants and f"…{reading}" not in variants
-                ):
-                    if reading not in variants and kata not in variants and f"…{reading}" not in variants:
-                        table.set_focus()
+                if not is_article_correct:
+                    if current_article != last_article:
                         send_keys("{VK_DOWN}")
                     break
 
-                last_reading = current_reading
-                table.set_focus()
+                last_article = current_article
                 send_keys("{VK_UP}")
 
             results: list[str] = []
-            last_text = ""
+
+            last_article = ""
             while True:
                 pane.set_focus()
-                pane.click_input()
-                send_keys("^a^c")
-                current_text = pyperclip.paste().strip()
-                current_reading = current_text.splitlines()[0]
-                variants = [v.strip() for v in current_reading.split("・")]
-                self.logger.debug(f"Variants {variants}")
+                pane.wait("ready", timeout=10)
 
-                if current_text == last_text or (
-                    reading not in variants and kata not in variants and f"…{reading}" not in variants
-                ):
+                send_keys("^a^c")
+                current_article = pyperclip.paste().strip()
+                is_article_correct = self.is_article_correct(
+                    current_article, word, kata
+                )
+
+                table.set_focus()
+
+                if not is_article_correct:
+                    if current_article != last_article:
+                        send_keys("{VK_DOWN}")
                     break
 
-                dot_count = current_text.splitlines()[1].count("・")
+                dot_count = current_article.splitlines()[1].count("・")
 
-                results.append(current_text)
-                last_text = current_text
-                table.set_focus()
+                results.append(current_article)
+                last_article = current_article
                 for _ in range(dot_count + 1):
                     send_keys("{VK_DOWN}")
 
@@ -127,9 +123,9 @@ class WordParserGUI:
                 word = reading
 
             senses = "\n".join(sents[strip:]).strip()
-            if senses.startswith('см. ') or ' см. ' in senses:
+            if senses.startswith("см. ") or " см. " in sents[strip:][0]:
                 continue
-            
+
             mainsense = self.get_mainsense(senses)
 
             t = Translation(
@@ -150,3 +146,25 @@ class WordParserGUI:
         result = part.partition(":")[-1].strip() or part.strip()
 
         return result
+
+    def is_article_correct(self, article_text: str, word: str, kata: str) -> bool:
+        current_reading = article_text.splitlines()[0]
+        variants = [v.strip() for v in current_reading.split("・")]
+        self.logger.debug(f"Variants {variants}")
+        reading = ""
+        kks = self.kks.convert(kata)
+
+        for item in kks:
+            reading += item["hira"]
+
+        self.logger.debug(f"Got reading {reading}")
+        if (
+            reading not in variants
+            and kata not in variants
+            and f"…{reading}" not in variants
+        ):
+            self.logger.debug(
+                f"Article {article_text} incorrect for word {word} with reading {reading} and kata {kata}"
+            )
+            return False
+        return True

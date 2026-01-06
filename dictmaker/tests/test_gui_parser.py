@@ -296,3 +296,35 @@ def test_nonstandard_kakaru(parser):
     assert first_res.word == "かかる"
     assert first_res.reading == "かかる"
     assert first_res.mainsense == "начинается..., вот-вот..., почти..., чуть не..."
+
+
+def test_recursive_good(parser):
+    test_articles = [
+        """ひざし　　　
+日差し･日射し
+1) солнечный свет, лучи солнца;
+2) см. <<ひあし【日脚】 1>>."""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "日差し･日射し"
+    assert first_res.reading == "ひざし"
+    assert first_res.mainsense == "солнечный свет, лучи солнца"
+
+
+def test_kata_only(parser):
+    test_articles = [
+        """チョコレート
+шоколад (англ. chocolate)"""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "チョコレート"
+    assert first_res.reading == "チョコレート"
+    assert first_res.mainsense == "шоколад (англ. chocolate)"

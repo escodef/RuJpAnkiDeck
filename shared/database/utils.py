@@ -146,7 +146,7 @@ def get_by_reading(reading: str, limit=3) -> list[TranslationTable]:
         session.close()
 
 
-def get_by_index(query: int):
+def get_by_index(query: int) -> list[TranslationTable]:
     session = SessionLocal()
     try:
         results = (
