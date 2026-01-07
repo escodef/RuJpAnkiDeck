@@ -61,8 +61,14 @@ class JapaneseDictionaryParser:
         logging.info("Gracefully shutting down...")
         self.running = False
 
+    def _get_variants(self, text: str) -> set[str]:
+        if not text:
+            return set()
+        return {v.strip() for v in text.split("・")}
+
     def parse_words(self, words: List[List[str]]) -> DictionaryList:
         batch_size = 50
+        seen_in_batch = set()
         for index, wordcsv in enumerate(words):
             if not self.running:
                 save_to_sqlite(self.dictionary)
@@ -95,16 +101,26 @@ class JapaneseDictionaryParser:
                 logging.info(f"found translations: {translations}")
 
                 for translation in translations:
-                    is_duplicate_in_batch = any(
-                        t.word == translation.word for t in self.dictionary
-                    )
-                    if not is_duplicate_in_batch:
+                    new_words = self._get_variants(translation.word)
+                    new_readings = self._get_variants(translation.reading)
+
+                    is_duplicate = False
+                    for w in new_words:
+                        for r in new_readings:
+                            if (w, r) in seen_in_batch:
+                                is_duplicate = True
+                                break
+                        if is_duplicate: 
+                            break
+
+                    if not is_duplicate:
                         translation.index_csv = index
                         self.dictionary.append(translation)
+                        for w in new_words:
+                            for r in new_readings:
+                                seen_in_batch.add((w, r))
                     else:
-                        logging.warning(
-                            f"found dup translation: {translation} for word {word} at index {index}"
-                        )
+                        logging.warning(f"found dup translation: {translation.word} for word {word} at index {index}")
 
                 if len(translations) == 0:
                     logging.warning(
@@ -115,6 +131,7 @@ class JapaneseDictionaryParser:
                 if len(self.dictionary) >= batch_size:
                     save_to_sqlite(self.dictionary)
                     self.dictionary.clear()
+                    seen_in_batch.clear()
                     logging.info("Batch saved to database.")
 
             except Exception as e:
@@ -129,7 +146,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        parser.parse_words(words_to_parse[:2000])
+        parser.parse_words(words_to_parse[:10000])
         save_to_sqlite(parser.dictionary)
 
         logging.info("Parse done")
