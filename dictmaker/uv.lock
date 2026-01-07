@@ -13,24 +13,24 @@ wheels = [
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.14.2"
+version = "4.14.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "soupsieve" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/77/e9/df2358efd7659577435e2177bfa69cba6c33216681af51a707193dec162a/beautifulsoup4-4.14.2.tar.gz", hash = "sha256:2a98ab9f944a11acee9cc848508ec28d9228abfd522ef0fad6a02a72e0ded69e", size = 625822, upload-time = "2025-09-29T10:05:42.613Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c3/b0/1c6a16426d389813b48d95e26898aff79abbde42ad353958ad95cc8c9b21/beautifulsoup4-4.14.3.tar.gz", hash = "sha256:6292b1c5186d356bba669ef9f7f051757099565ad9ada5dd630bd9de5fa7fb86", size = 627737, upload-time = "2025-11-30T15:08:26.084Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/fe/3aed5d0be4d404d12d36ab97e2f1791424d9ca39c2f754a6285d59a3b01d/beautifulsoup4-4.14.2-py3-none-any.whl", hash = "sha256:5ef6fa3a8cbece8488d66985560f97ed091e22bbc4e9c2338508a9d5de6d4515", size = 106392, upload-time = "2025-09-29T10:05:43.771Z" },
+    { url = "https://files.pythonhosted.org/packages/1a/39/47f9197bdd44df24d67ac8893641e16f386c984a0619ef2ee4c51fbbc019/beautifulsoup4-4.14.3-py3-none-any.whl", hash = "sha256:0918bfe44902e6ad8d57732ba310582e98da931428d231a5ecb9e7c703a735bb", size = 107721, upload-time = "2025-11-30T15:08:24.087Z" },
 ]
 
 [[package]]
 name = "certifi"
-version = "2025.11.12"
+version = "2026.1.4"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a2/8c/58f469717fa48465e4a50c014a0400602d3c437d7c0c468e17ada824da3a/certifi-2025.11.12.tar.gz", hash = "sha256:d8ab5478f2ecd78af242878415affce761ca6bc54a22a27e026d7c25357c3316", size = 160538, upload-time = "2025-11-12T02:54:51.517Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e0/2d/a891ca51311197f6ad14a7ef42e2399f36cf2f9bd44752b3dc4eab60fdc5/certifi-2026.1.4.tar.gz", hash = "sha256:ac726dd470482006e014ad384921ed6438c457018f4b3d204aea4281258b2120", size = 154268, upload-time = "2026-01-04T02:42:41.825Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/70/7d/9bc192684cea499815ff478dfcdc13835ddf401365057044fb721ec6bddb/certifi-2025.11.12-py3-none-any.whl", hash = "sha256:97de8790030bbd5c2d96b7ec782fc2f7820ef8dba6db909ccf95449f2d062d4b", size = 159438, upload-time = "2025-11-12T02:54:49.735Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/ad/3cc14f097111b4de0040c83a525973216457bbeeb63739ef1ed275c1c021/certifi-2026.1.4-py3-none-any.whl", hash = "sha256:9943707519e4add1115f44c2bc244f782c0249876bf51b6599fee1ffbedd685c", size = 152900, upload-time = "2026-01-04T02:42:40.15Z" },
 ]
 
 [[package]]
@@ -85,11 +85,11 @@ wheels = [
 
 [[package]]
 name = "comtypes"
-version = "1.4.13"
+version = "1.4.14"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c0/5c/848f18615227fe20f5ba61b271bbeb670f2ea894f76fb3a533e53d4b52d4/comtypes-1.4.13.zip", hash = "sha256:fc573997ae32b374891cfa8d79ebb8289809ed3a4a3f789d5348371099c7788a", size = 281325, upload-time = "2025-10-12T14:25:09.061Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/12/63d8d4583289bec500df776af2f62611d732342ef0212e05b1a8d16ed945/comtypes-1.4.14.tar.gz", hash = "sha256:86016d30262a3155bc45b0451cdc5a8bb5cc5728831baa266752e4a8f1932565", size = 224342, upload-time = "2025-12-15T23:00:48.556Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/95/f30c80615fda0d3c0ee6493ac9db61183313b43499b62dec136773b0e870/comtypes-1.4.13-py3-none-any.whl", hash = "sha256:21546210748ba52e839e52112124b16ffab7d7fb68096493165fbc249e9023ad", size = 254433, upload-time = "2025-10-12T14:25:07.539Z" },
+    { url = "https://files.pythonhosted.org/packages/05/0e/9827d17a2c22f825c660195410a7cbbe3c7f87426ee1597bef42bd2d2594/comtypes-1.4.14-py3-none-any.whl", hash = "sha256:89f86810216d8daad7f7e521dac776a0ca0e2116bcf2e5b5e10beb0963eab6bc", size = 254775, upload-time = "2025-12-15T23:00:46.32Z" },
 ]
 
 [[package]]
@@ -127,7 +127,6 @@ dependencies = [
     { name = "pydantic-core" },
     { name = "pygments" },
     { name = "pykakasi" },
-    { name = "pyperclip" },
     { name = "pyqt5" },
     { name = "pyqt5-qt5" },
     { name = "pyqt5-sip" },
@@ -153,11 +152,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "annotated-types", specifier = "==0.7.0" },
-    { name = "beautifulsoup4", specifier = "==4.14.2" },
-    { name = "certifi", specifier = "==2025.11.12" },
+    { name = "beautifulsoup4", specifier = ">=4.14.3" },
+    { name = "certifi", specifier = ">=2026.1.4" },
     { name = "charset-normalizer", specifier = "==3.4.4" },
     { name = "colorama", specifier = "==0.4.6" },
-    { name = "comtypes", specifier = "==1.4.13" },
+    { name = "comtypes", specifier = ">=1.4.14" },
     { name = "deprecated", specifier = "==1.3.1" },
     { name = "greenlet", specifier = "==3.3.0" },
     { name = "html2text", specifier = "==2025.4.15" },
@@ -166,11 +165,10 @@ requires-dist = [
     { name = "jaconv", specifier = "==0.4.0" },
     { name = "packaging", specifier = "==25.0" },
     { name = "pluggy", specifier = "==1.6.0" },
-    { name = "pydantic", specifier = "==2.12.4" },
+    { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pydantic-core", specifier = "==2.41.5" },
     { name = "pygments", specifier = "==2.19.2" },
     { name = "pykakasi", specifier = "==2.3.0" },
-    { name = "pyperclip", specifier = "==1.11.0" },
     { name = "pyqt5", specifier = "==5.15.11" },
     { name = "pyqt5-qt5", specifier = "==5.15.2" },
     { name = "pyqt5-sip", specifier = "==12.17.2" },
@@ -180,11 +178,11 @@ requires-dist = [
     { name = "pywinauto", specifier = "==0.6.9" },
     { name = "requests", specifier = "==2.32.5" },
     { name = "six", specifier = "==1.17.0" },
-    { name = "soupsieve", specifier = "==2.8" },
+    { name = "soupsieve", specifier = ">=2.8.1" },
     { name = "sqlalchemy", specifier = "==2.0.45" },
     { name = "typing-extensions", specifier = "==4.15.0" },
     { name = "typing-inspection", specifier = "==0.4.2" },
-    { name = "urllib3", specifier = "==2.5.0" },
+    { name = "urllib3", specifier = ">=2.6.2" },
     { name = "wrapt", specifier = "==2.0.1" },
 ]
 
@@ -275,7 +273,7 @@ wheels = [
 
 [[package]]
 name = "pydantic"
-version = "2.12.4"
+version = "2.12.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-types" },
@@ -283,9 +281,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/96/ad/a17bc283d7d81837c061c49e3eaa27a45991759a1b7eae1031921c6bd924/pydantic-2.12.4.tar.gz", hash = "sha256:0f8cb9555000a4b5b617f66bfd2566264c4984b27589d3b845685983e8ea85ac", size = 821038, upload-time = "2025-11-05T10:50:08.59Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/44/36f1a6e523abc58ae5f928898e4aca2e0ea509b5aa6f6f392a5d882be928/pydantic-2.12.5.tar.gz", hash = "sha256:4d351024c75c0f085a9febbb665ce8c0c6ec5d30e903bdb6394b7ede26aebb49", size = 821591, upload-time = "2025-11-26T15:11:46.471Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/82/2f/e68750da9b04856e2a7ec56fc6f034a5a79775e9b9a81882252789873798/pydantic-2.12.4-py3-none-any.whl", hash = "sha256:92d3d202a745d46f9be6df459ac5a064fdaa3c1c4cd8adcfa332ccf3c05f871e", size = 463400, upload-time = "2025-11-05T10:50:06.732Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/87/b70ad306ebb6f9b585f114d0ac2137d792b48be34d732d60e597c2f8465a/pydantic-2.12.5-py3-none-any.whl", hash = "sha256:e561593fccf61e8a20fc46dfc2dfe075b8be7d0188df33f221ad1f0139180f9d", size = 463580, upload-time = "2025-11-26T15:11:44.605Z" },
 ]
 
 [[package]]
@@ -361,15 +359,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ad/32/2a8e213fd744459a03864af7cf4c6142ee061fc915757c8152d147b16015/pykakasi-2.3.0.tar.gz", hash = "sha256:fa052a8e63f59fb8d6569abbe719a8c9f9daf15ed27a67a56ab1705f0f67b0a1", size = 21752447, upload-time = "2024-06-24T04:57:31.233Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0f/e8/11644fe823e05c583b330e9fb81e3e8fc5d079036512a8300fc157be349d/pykakasi-2.3.0-py3-none-any.whl", hash = "sha256:26d21b090048ff45c6a4d8e962426b7951767216008ec30358e8a9d74af77f29", size = 2395003, upload-time = "2024-06-24T04:57:18.101Z" },
-]
-
-[[package]]
-name = "pyperclip"
-version = "1.11.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e8/52/d87eba7cb129b81563019d1679026e7a112ef76855d6159d24754dbd2a51/pyperclip-1.11.0.tar.gz", hash = "sha256:244035963e4428530d9e3a6101a1ef97209c6825edab1567beac148ccc1db1b6", size = 12185, upload-time = "2025-09-26T14:40:37.245Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/80/fc9d01d5ed37ba4c42ca2b55b4339ae6e200b456be3a1aaddf4a9fa99b8c/pyperclip-1.11.0-py3-none-any.whl", hash = "sha256:299403e9ff44581cb9ba2ffeed69c7aa96a008622ad0c46cb575ca75b5b84273", size = 11063, upload-time = "2025-09-26T14:40:36.069Z" },
 ]
 
 [[package]]
@@ -533,11 +522,11 @@ wheels = [
 
 [[package]]
 name = "soupsieve"
-version = "2.8"
+version = "2.8.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6d/e6/21ccce3262dd4889aa3332e5a119a3491a95e8f60939870a3a035aabac0d/soupsieve-2.8.tar.gz", hash = "sha256:e2dd4a40a628cb5f28f6d4b0db8800b8f581b65bb380b97de22ba5ca8d72572f", size = 103472, upload-time = "2025-08-27T15:39:51.78Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/89/23/adf3796d740536d63a6fbda113d07e60c734b6ed5d3058d1e47fc0495e47/soupsieve-2.8.1.tar.gz", hash = "sha256:4cf733bc50fa805f5df4b8ef4740fc0e0fa6218cf3006269afd3f9d6d80fd350", size = 117856, upload-time = "2025-12-18T13:50:34.655Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/a0/bb38d3b76b8cae341dad93a2dd83ab7462e6dbcdd84d43f54ee60a8dc167/soupsieve-2.8-py3-none-any.whl", hash = "sha256:0cc76456a30e20f5d7f2e14a98a4ae2ee4e5abdc7c5ea0aafe795f344bc7984c", size = 36679, upload-time = "2025-08-27T15:39:50.179Z" },
+    { url = "https://files.pythonhosted.org/packages/48/f3/b67d6ea49ca9154453b6d70b34ea22f3996b9fa55da105a79d8732227adc/soupsieve-2.8.1-py3-none-any.whl", hash = "sha256:a11fe2a6f3d76ab3cf2de04eb339c1be5b506a8a47f2ceb6d139803177f85434", size = 36710, upload-time = "2025-12-18T13:50:33.267Z" },
 ]
 
 [[package]]
@@ -592,11 +581,11 @@ wheels = [
 
 [[package]]
 name = "urllib3"
-version = "2.5.0"
+version = "2.6.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/15/22/9ee70a2574a4f4599c47dd506532914ce044817c7752a79b6a51286319bc/urllib3-2.5.0.tar.gz", hash = "sha256:3fc47733c7e419d4bc3f6b3dc2b4f890bb743906a30d56ba4a5bfa4bbff92760", size = 393185, upload-time = "2025-06-18T14:07:41.644Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/24/a2a2ed9addd907787d7aa0355ba36a6cadf1768b934c652ea78acbd59dcd/urllib3-2.6.2.tar.gz", hash = "sha256:016f9c98bb7e98085cb2b4b17b87d2c702975664e4f060c6532e64d1c1a5e797", size = 432930, upload-time = "2025-12-11T15:56:40.252Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a7/c2/fe1e52489ae3122415c51f387e221dd0773709bad6c6cdaa599e8a2c5185/urllib3-2.5.0-py3-none-any.whl", hash = "sha256:e6b01673c0fa6a13e374b50871808eb3bf7046c4b125b216f6bf1cc604cff0dc", size = 129795, upload-time = "2025-06-18T14:07:40.39Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/b9/4095b668ea3678bf6a0af005527f39de12fb026516fb3df17495a733b7f8/urllib3-2.6.2-py3-none-any.whl", hash = "sha256:ec21cddfe7724fc7cb4ba4bea7aa8e2ef36f607a4bab81aa6ce42a13dc3f03dd", size = 131182, upload-time = "2025-12-11T15:56:38.584Z" },
 ]
 
 [[package]]

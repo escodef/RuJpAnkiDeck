@@ -129,7 +129,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        parser.parse_words(words_to_parse[:8000])
+        parser.parse_words(words_to_parse[:2000])
         save_to_sqlite(parser.dictionary)
 
         logging.info("Parse done")
