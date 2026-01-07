@@ -48,6 +48,22 @@ def test_basic_article_hani(parser):
     assert first_res.mainsense == "сфера, область, круг"
 
 
+def test_basic_article_no(parser):
+    test_articles = [
+        """の
+野
+поле; равнина; луг; степь; степь"""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "野"
+    assert first_res.reading == "の"
+    assert first_res.mainsense == "поле, равнина, луг, степь"
+
+
 def test_basic_article_shindan(parser):
     test_articles = [
         """しんだん
@@ -64,6 +80,25 @@ def test_basic_article_shindan(parser):
     assert first_res.word == "診断"
     assert first_res.reading == "しんだん"
     assert first_res.mainsense == "диагноз"
+
+
+def test_basic_article_iu(parser):
+    test_articles = [
+        """いう
+言う
+1. говорить; сказать, заметить; заявлять; излагать; высказывать; утверждать
+2. рассказывать, сообщать
+3. называть; называться"""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "言う"
+    assert first_res.reading == "いう"
+    assert first_res.mainsense == "говорить, сказать, заметить"
+
 
 
 def test_list_article_beshi(parser):

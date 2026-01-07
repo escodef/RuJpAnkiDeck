@@ -110,7 +110,7 @@ class JapaneseDictionaryParser:
                             if (w, r) in seen_in_batch:
                                 is_duplicate = True
                                 break
-                        if is_duplicate: 
+                        if is_duplicate:
                             break
 
                     if not is_duplicate:
@@ -120,7 +120,9 @@ class JapaneseDictionaryParser:
                             for r in new_readings:
                                 seen_in_batch.add((w, r))
                     else:
-                        logging.warning(f"found dup translation: {translation.word} for word {word} at index {index}")
+                        logging.warning(
+                            f"found dup translation: {translation.word} for word {word} at index {index}"
+                        )
 
                 if len(translations) == 0:
                     logging.warning(
@@ -146,7 +148,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = JapaneseDictionaryParser()
-        parser.parse_words(words_to_parse[:10000])
+        parser.parse_words(words_to_parse[:13000])
         save_to_sqlite(parser.dictionary)
 
         logging.info("Parse done")

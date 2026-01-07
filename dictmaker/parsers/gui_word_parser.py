@@ -82,12 +82,9 @@ class WordParserGUI:
                 if not is_article_correct:
                     break
 
-                dot_count = current_article.splitlines()[1].count("・")
-
                 results.append(current_article)
                 last_article = current_article
-                for _ in range(dot_count + 1):
-                    table_obj.type_keys("{VK_DOWN}")
+                table_obj.type_keys("{VK_DOWN}")
 
             return self.process_results(results)
 
@@ -126,13 +123,22 @@ class WordParserGUI:
         return ts
 
     def get_mainsense(self, article: str) -> str:
-        match = re.search(r"\d+[\.\)]:?\s+([^;:\n]+)", article)
+        match = re.search(r"\d+[\.\)]:?\s+([^:\n]+)", article)
 
         if match:
-            return match.group(1).strip()
+            senses = match.group(1).strip().split(";")
+        else:
+            senses = article.split(";")
 
-        part = article.split(";")[0]
+        part = senses[0].strip()
         result = part.partition(":")[-1].strip() or part.strip()
+        i = 1
+        while i < len(senses):
+            part = senses[i].strip()
+            if len(result + part) > 25 or not part:
+                break
+            result = result + ", " + (part.partition(":")[-1].strip() or part.strip())
+            i = i + 1
 
         return result
 
@@ -157,7 +163,15 @@ class WordParserGUI:
         self.logger.debug(f"Got reading {reading}")
 
         reading_ok = (
-            reading in variants or kata in variants or f"…{reading}" in variants
+            reading in variants
+            or kata in variants
+            or f"…{reading}" in variants
+            or f"{reading}…" in variants
+            or (
+                reading.endswith("する")
+                and len(reading) > 2
+                and reading.removesuffix("する") in variants
+            )
         )
 
         kanji_ok = word in kanji_variants
