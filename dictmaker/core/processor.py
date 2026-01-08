@@ -2,7 +2,6 @@ import sys
 import os
 import logging
 import traceback
-import signal
 import re
 from dotenv import load_dotenv
 from shared.database.utils import (
@@ -40,11 +39,7 @@ class DictionaryProcessor:
 
         self.dictionary: DictionaryList = list()
 
-        signal.signal(signal.SIGINT, self._handle_exit)
-        signal.signal(signal.SIGTERM, self._handle_exit)
-
-    def _handle_exit(self, signum, frame):
-        logging.info("Gracefully shutting down...")
+    def stop(self):
         self.running = False
 
     def _get_variants(self, text: str) -> set[str]:

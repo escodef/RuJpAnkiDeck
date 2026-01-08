@@ -1,3 +1,4 @@
+import signal
 import logging
 from shared.database.db_session import init_db, SessionLocal
 from shared.database.utils import save_to_sqlite
@@ -18,11 +19,18 @@ logging.basicConfig(
 def main():
     init_db()
     session = SessionLocal()
+    processor = DictionaryProcessor()
+
+    def signal_handler(signum, frame):
+        logging.info("Gracefully shutting down...")
+        processor.stop()
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     try:
         words_to_parse = get_words()
-        parser = DictionaryProcessor()
-        parser.parse_words(words_to_parse[:15000])
-        save_to_sqlite(parser.dictionary)
+        processor.parse_words(words_to_parse[:15000])
+        save_to_sqlite(processor.dictionary)
 
         logging.info("Parse done")
     finally:
