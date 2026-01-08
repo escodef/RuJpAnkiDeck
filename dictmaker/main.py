@@ -4,17 +4,7 @@ import logging
 import traceback
 import signal
 from dotenv import load_dotenv
-
-load_dotenv()
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(root_path)
-
-from typing import List
-from models.models import DictionaryList
-from parsers.word_parser import WordParser
-from parsers.gui_word_parser import WordParserGUI
-
-from shared.database.db_session import init_db, SessionLocal
+from shared.database.db_session import init_db
 from shared.database.utils import (
     save_to_sqlite,
     get_by_index,
@@ -23,10 +13,18 @@ from shared.database.utils import (
     add_not_found,
     get_not_found,
 )
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from shared.csv.utils import get_words
 from shared.regex.utils import has_kanji
 from shared.kakashi.utils import get_hiragana
 
+from typing import List
+from models.models import DictionaryList
+from parsers.word_parser import WordParser
+from parsers.gui_word_parser import WordParserGUI
+
+load_dotenv()
 
 dict_url = os.getenv("DICT_URL")
 jardic_path = os.getenv("JARDIC_PATH")
@@ -144,6 +142,9 @@ class JapaneseDictionaryParser:
 
 def main():
     init_db()
+    db_path = os.getenv("DB_PATH", "dictionary.db")
+    engine = create_engine(f"sqlite:///{db_path}")
+    SessionLocal = sessionmaker(bind=engine)
     session = SessionLocal()
     try:
         words_to_parse = get_words()

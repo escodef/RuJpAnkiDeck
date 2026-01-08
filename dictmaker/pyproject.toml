@@ -5,21 +5,8 @@ description = "Dictionary generator for anki cards"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "beautifulsoup4>=4.14.3",
-    "html2text>=2025.4.15",
-    "pydantic>=2.12.5",
-    "pykakasi>=2.3.0",
-    "pytest>=9.0.2",
-    "python-dotenv>=1.2.1",
-    "pywinauto>=0.6.9",
-    "requests>=2.32.5",
-    "sqlalchemy>=2.0.45",
+    "shared",
 ]
 
-[dependency-groups]
-dev = [
-    "ruff>=0.14.10",
-]
-
-[tool.uv]
-cache-dir = "./.uv_cache"
+[tool.uv.sources]
+shared = { workspace = true }

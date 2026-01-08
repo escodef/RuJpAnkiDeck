@@ -1,24 +1,19 @@
 import os
-import sys
 import logging
 
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
 from template import CARD_CSS, JP_RU_FRONT, JP_RU_BACK, RU_JP_FRONT, RU_JP_BACK
 from dotenv import load_dotenv
-
-load_dotenv()
-
-tts_folder = os.getenv("TTS_OUTPUT_FOLDER")
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from shared.database.db_session import init_db
 from shared.database.utils import get_by_word_and_reading, get_by_reading
 from shared.csv.utils import get_words
 from shared.kakashi.utils import get_hiragana
 from shared.regex.utils import has_kanji
 
+load_dotenv()
+
+tts_folder = os.getenv("TTS_OUTPUT_FOLDER")
 
 init_db()
 
