@@ -165,6 +165,7 @@ class WordParserGUI:
         reading_ok = (
             reading in variants
             or kata in variants
+            or word in variants
             or f"…{reading}" in variants
             or f"{reading}…" in variants
             or (
@@ -175,6 +176,7 @@ class WordParserGUI:
         )
 
         kanji_ok = word in kanji_variants
+
         if reading_ok or kanji_ok:
             return True
 

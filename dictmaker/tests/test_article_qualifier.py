@@ -13,11 +13,33 @@ def parser():
 
 
 def test_basic_article_ra(parser):
-    test_articles_ra = """…ら
+    test_article = """…ら
 …等
 суф. мн. числа; после имени собств. и другие; и его друзья (сторонники); и иже с ним, и его присные; и сопровождающие его лица.
 """
 
-    result = parser.is_article_correct(test_articles_ra, "ら", "ラ")
+    result = parser.is_article_correct(test_article, "ら", "ラ")
+
+    assert result is True
+
+
+def test_basic_article_check(parser):
+    test_article = """チェックする
+1. проверять (англ. to check)
+2. отмечать, помечать
+3. препятствовать, тормозить"""
+
+    result = parser.is_article_correct(test_article, "チェックする", "チェックスル")
+
+    assert result is True
+
+
+def test_basic_article_kouchiku(parser):
+    test_article = """こうちく　　
+構築
+сооружение, постройка, строительство;
+～する сооружать, строить, воздвигать."""
+
+    result = parser.is_article_correct(test_article, "構築する", "コウチクスル")
 
     assert result is True
