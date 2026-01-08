@@ -21,7 +21,7 @@ def main():
     try:
         words_to_parse = get_words()
         parser = DictionaryProcessor()
-        parser.parse_words(words_to_parse[:13000])
+        parser.parse_words(words_to_parse[:15000])
         save_to_sqlite(parser.dictionary)
 
         logging.info("Parse done")

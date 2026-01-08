@@ -363,3 +363,24 @@ def test_kata_only(parser):
     assert first_res.word == "チョコレート"
     assert first_res.reading == "チョコレート"
     assert first_res.mainsense == "шоколад (англ. chocolate)"
+
+
+def test_article_with_brackets(parser):
+    test_articles = [
+        """ごう
+号
+1. номер (порядковый; употр. после числ.)
+2. номер (журнала, газеты и т.п.), выпуск
+3. параграф; пункт; рубрика (после числ.)
+4. псевдоним
+5. учёная степень"""
+    ]
+
+    results = parser.process_results(test_articles)
+
+    first_res = results[0]
+    assert isinstance(first_res, Translation)
+    assert first_res.word == "号"
+    assert first_res.reading == "ごう"
+    assert first_res.mainsense == "номер порядковый"
+

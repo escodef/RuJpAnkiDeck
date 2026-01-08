@@ -140,7 +140,7 @@ class WordParserGUI:
             result = result + ", " + (part.partition(":")[-1].strip() or part.strip())
             i = i + 1
 
-        return result
+        return result if result.count("(") == result.count(")") else result.replace("(", "").replace(")", "")
 
     def is_article_correct(self, article_text: str, word: str, kata: str) -> bool:
         lines = article_text.splitlines()
