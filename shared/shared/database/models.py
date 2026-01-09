@@ -11,7 +11,7 @@ class TranslationTable(Base):
     reading = Column(String, index=True)
     mainsense = Column(String)
     senses = Column(String)
-    index_csv = Column(Integer)
+    index_csv = Column(Integer, index=True)
 
     examples = relationship("ExampleTable", back_populates="translation", cascade="all, delete-orphan")
 

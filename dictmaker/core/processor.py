@@ -6,11 +6,11 @@ import re
 from dotenv import load_dotenv
 from shared.database.utils import (
     save_to_sqlite,
-    get_by_index,
     get_by_reading,
     get_by_word_and_reading,
     add_not_found,
     get_not_found,
+    get_all_parsed_indexes,
 )
 from shared.regex.utils import has_kanji
 from shared.kakashi.utils import get_hiragana
@@ -29,13 +29,12 @@ jardic_path = os.getenv("JARDIC_PATH")
 class DictionaryProcessor:
     def __init__(self):
         self.is_windows = sys.platform == "win32"
-        self.parser = WordParser(dict_url)
+        self.parser = (
+            WordParserGUI(jardic_path) if self.is_windows else WordParser(dict_url)
+        )
         self.running = True
 
-        if self.is_windows:
-            self.gui_parser = WordParserGUI(jardic_path)
-        else:
-            self.gui_parser = None
+        self.parsed_indexes = get_all_parsed_indexes()
 
         self.dictionary: DictionaryList = list()
 
@@ -66,6 +65,21 @@ class DictionaryProcessor:
             clean_reading = new_reading.strip("…")
             seen_set.add((clean_word, clean_reading))
 
+    def is_word_parsed(self, word, reading_raw, index):
+        if index in self.parsed_indexes:
+            return True
+        exists = None
+        reading = get_hiragana(reading_raw)
+        if has_kanji(word):
+            exists = get_by_word_and_reading(word, reading)
+        else:
+            exists = get_by_reading(reading)
+
+        if not exists:
+            exists = get_not_found(word, reading_raw)
+
+        return bool(exists)
+
     def parse_words(self, words: List[List[str]]) -> DictionaryList:
         batch_size = 50
         seen_in_batch = set()
@@ -75,25 +89,11 @@ class DictionaryProcessor:
                 break
             word, _, reading_raw = wordcsv[:3]
             try:
-                exists = None
-                reading = get_hiragana(reading_raw)
-                if has_kanji(word):
-                    exists = get_by_word_and_reading(word, reading)
-                else:
-                    exists = get_by_reading(reading)
-
-                if not exists:
-                    exists = get_not_found(word, reading_raw)
-
-                is_parsed_before = get_by_index(index)
-                if len(is_parsed_before) > 0 or exists:
+                if self.is_word_parsed(word, reading_raw, index):
                     continue
                 logging.info(f"Parsing word: {word} at index {index}")
 
-                if self.is_windows and self.gui_parser:
-                    translations = self.gui_parser.parse_word(wordcsv)
-                else:
-                    translations = self.parser.parse_word(wordcsv)
+                translations = self.parser.parse_word(wordcsv)
 
                 if translations is None:
                     continue

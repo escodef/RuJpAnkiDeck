@@ -157,3 +157,11 @@ def get_by_index(query: int) -> list[TranslationTable]:
         return results
     finally:
         session.close()
+
+def get_all_parsed_indexes() -> set[int]:
+    session = SessionLocal()
+    try:
+        results = session.query(TranslationTable.index_csv).distinct().all()
+        return {r[0] for r in results if r[0] is not None}
+    finally:
+        session.close()
