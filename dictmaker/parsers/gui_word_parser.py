@@ -1,13 +1,13 @@
 import logging
-import pykakasi
 import re
 
 from typing import List
+from pykakasi import kakasi
 from pywinauto import Application
 from pywinauto.controls.uia_controls import ListViewWrapper
 from pywinauto.findwindows import ElementNotFoundError
 from models.models import Translation
-from shared.regex.utils import has_cyrillic, has_kanji
+from shared.regex.utils import has_cyrillic, has_kanji, split_by_dots
 
 
 class WordParserGUI:
@@ -26,7 +26,9 @@ class WordParserGUI:
 
         self.win = self.app.window(title_re=".*Jardic.*")
         self.win.wait("ready", timeout=10)
-        self.kks = pykakasi.kakasi()
+        self.kks = kakasi()
+
+        self.yarxi_pattern = r"^\[[a-zA-Z]+\]$"
 
     def switch_tab(self, tab_index: int):
         tab_ctrl = self.win.child_window(control_type="Tab")
@@ -98,13 +100,25 @@ class WordParserGUI:
             entry = entry.replace("\r", "")
             sents = entry.split("\n")
             strip = 1
-            reading = entry.splitlines()[0].strip()
 
-            if not has_cyrillic(sents[1]):
-                word = sents[1]
-                strip = 2
+            if re.match(self.yarxi_pattern, sents[1]):
+                word = sents[0]
+                reading = "".join(
+                    [
+                        item["kana"]
+                        for item in self.kks.convert(
+                            sents[1].replace("[", "").replace("]", "")
+                        )
+                    ]
+                )
+
             else:
-                word = reading
+                reading = entry.splitlines()[0].strip()
+                if not has_cyrillic(sents[1]):
+                    word = sents[1]
+                    strip = 2
+                else:
+                    word = reading
 
             senses = "\n".join(sents[strip:]).strip()
             is_article_recur = senses.startswith("см. ") or " см. " in sents[strip:][0]
@@ -140,38 +154,52 @@ class WordParserGUI:
             result = result + ", " + (part.partition(":")[-1].strip() or part.strip())
             i = i + 1
 
-        return result if result.count("(") == result.count(")") else result.replace("(", "").replace(")", "")
+        return (
+            result
+            if result.count("(") == result.count(")")
+            else result.replace("(", "").replace(")", "")
+        )
 
     def is_article_correct(self, article_text: str, word: str, kata: str) -> bool:
         lines = article_text.splitlines()
         if not lines:
             return False
 
-        current_reading = lines[0]
-        second_line = lines[1] if len(lines) >= 2 else ""
+        if re.match(self.yarxi_pattern, lines[1]):
+            kana_line = "".join(
+                [
+                    item["kana"]
+                    for item in self.kks.convert(
+                        lines[1].replace("[", "").replace("]", "")
+                    )
+                ]
+            )
+            kanji_line = lines[0].split()[0] if has_kanji(lines[0]) else ""
+            kana_variants = [kana_line]
+            kanji_variants = [kanji_line.strip()]
+        else:
+            kana_line = lines[0]
+            kanji_line = lines[1] if has_kanji(lines[1]) else ""
+            kana_variants = [v.strip() for v in split_by_dots(kana_line)]
+            kanji_variants = [v.strip() for v in split_by_dots(kanji_line)]
 
-        variants = [v.strip() for v in current_reading.split("・")]
-
-        kanji_variants = []
-        if has_kanji(second_line):
-            kanji_variants = [v.strip() for v in second_line.split("・")]
-
-        self.logger.debug(f"Variants {variants}")
+        self.logger.debug(f"kana_variants {kana_variants}")
+        self.logger.debug(f"kanji_variants {kanji_variants}")
 
         reading = "".join([item["hira"] for item in self.kks.convert(kata)])
 
         self.logger.debug(f"Got reading {reading}")
 
         reading_ok = (
-            reading in variants
-            or kata in variants
-            or word in variants
-            or f"…{reading}" in variants
-            or f"{reading}…" in variants
+            reading in kana_variants
+            or kata in kana_variants
+            or word in kana_variants
+            or f"…{reading}" in kana_variants
+            or f"{reading}…" in kana_variants
             or (
                 reading.endswith("する")
                 and len(reading) > 2
-                and reading.removesuffix("する") in variants
+                and reading.removesuffix("する") in kana_variants
             )
         )
 

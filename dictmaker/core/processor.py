@@ -2,7 +2,6 @@ import sys
 import os
 import logging
 import traceback
-import re
 from dotenv import load_dotenv
 from shared.database.utils import (
     save_to_sqlite,
@@ -12,7 +11,7 @@ from shared.database.utils import (
     get_not_found,
     get_all_parsed_indexes,
 )
-from shared.regex.utils import has_kanji
+from shared.regex.utils import has_kanji, split_by_dots
 from shared.kakashi.utils import get_hiragana
 
 from typing import List
@@ -44,7 +43,7 @@ class DictionaryProcessor:
     def _get_variants(self, text: str) -> set[str]:
         if not text:
             return set()
-        return {v.strip() for v in re.split(r"・|･", text) if v.strip()}
+        return {v.strip() for v in split_by_dots(text) if v.strip()}
 
     def is_duplicate_translation(
         self, translation, seen_set: set[tuple[str, str]]

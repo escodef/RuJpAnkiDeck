@@ -1,4 +1,5 @@
 import pytest
+import pykakasi
 
 from parsers.gui_word_parser import WordParserGUI
 from models.models import Translation
@@ -7,6 +8,9 @@ from models.models import Translation
 @pytest.fixture
 def parser():
     obj = WordParserGUI.__new__(WordParserGUI)
+    obj.kks = pykakasi.kakasi()
+    obj.yarxi_pattern = r"^\[[a-zA-Z]+\]$"
+
     return obj
 
 
@@ -98,7 +102,6 @@ def test_basic_article_iu(parser):
     assert first_res.word == "言う"
     assert first_res.reading == "いう"
     assert first_res.mainsense == "говорить, сказать, заметить"
-
 
 
 def test_list_article_beshi(parser):
@@ -384,3 +387,46 @@ def test_article_with_brackets(parser):
     assert first_res.reading == "ごう"
     assert first_res.mainsense == "номер порядковый"
 
+
+def test_article_one_kanji_diff_reading(parser):
+    test_articles = [
+        """たん, たんぶ　
+反･段, 反歩･段歩
+= 10 сэ = 0,0992 га""",
+        """はん　　　　
+反
+1) лог. антитезис;
+2) см. <<はんたい【反対】>>;
+3) см. <<はんせつ【反切】>>.""",
+        """はん　　　　
+反…
+анти…, контр…, против[о]…;
+反帝国主義的 антиимпериалистический.""",
+    ]
+
+    result1 = parser.process_results(test_articles)[1]
+    result2 = parser.process_results(test_articles)[2]
+
+    assert result1.word == "反"
+    assert result1.reading == "はん"
+    assert result1.mainsense == "лог. антитезис"
+    assert result2.word == "反…"
+    assert result2.reading == "はん"
+    assert result2.mainsense == "анти…, контр…, против[о]…"
+
+
+def test_yarxi_simple_article(parser):
+    test_articles = [
+        """東口
+[higashiguchi]
+восточный вход (выход)
+
+TN57062"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "東口"
+    assert result.reading == "ひがしぐち"
+    assert result.mainsense == "восточный вход (выход)"
+    assert result.senses == "восточный вход (выход)"
