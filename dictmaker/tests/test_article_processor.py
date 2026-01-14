@@ -1,5 +1,4 @@
 import pytest
-import pykakasi
 
 from parsers.gui_word_parser import WordParserGUI
 from models.models import Translation
@@ -8,7 +7,6 @@ from models.models import Translation
 @pytest.fixture
 def parser():
     obj = WordParserGUI.__new__(WordParserGUI)
-    obj.kks = pykakasi.kakasi()
     obj.yarxi_pattern = r"^\[[a-zA-Z]+\]$"
 
     return obj

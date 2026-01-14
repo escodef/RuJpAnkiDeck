@@ -1,6 +1,5 @@
 import pytest
 import logging
-import pykakasi
 from parsers.gui_word_parser import WordParserGUI
 
 
@@ -8,7 +7,6 @@ from parsers.gui_word_parser import WordParserGUI
 def parser():
     obj = WordParserGUI.__new__(WordParserGUI)
     obj.logger = logging
-    obj.kks = pykakasi.kakasi()
     obj.yarxi_pattern = r"^\[[a-zA-Z]+\]$"
 
     return obj

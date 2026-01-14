@@ -2,6 +2,8 @@ import sys
 import os
 import logging
 import traceback
+import jaconv
+
 from dotenv import load_dotenv
 from shared.database.utils import (
     save_to_sqlite,
@@ -12,8 +14,6 @@ from shared.database.utils import (
     get_all_parsed_indexes,
 )
 from shared.regex.utils import has_kanji, split_by_dots
-from shared.kakashi.utils import get_hiragana
-
 from typing import List
 from models.models import DictionaryList
 from parsers.word_parser import WordParser
@@ -64,18 +64,18 @@ class DictionaryProcessor:
             clean_reading = new_reading.strip("…")
             seen_set.add((clean_word, clean_reading))
 
-    def is_word_parsed(self, word, reading_raw, index):
+    def is_word_parsed(self, word, reading_kata, index):
         if index in self.parsed_indexes:
             return True
         exists = None
-        reading = get_hiragana(reading_raw)
+        reading = jaconv.kata2hira(reading_kata)
         if has_kanji(word):
             exists = get_by_word_and_reading(word, reading)
         else:
             exists = get_by_reading(reading)
 
         if not exists:
-            exists = get_not_found(word, reading_raw)
+            exists = get_not_found(word, reading_kata)
 
         return bool(exists)
 

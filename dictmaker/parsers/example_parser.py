@@ -1,7 +1,6 @@
 import requests
 import html2text
 import logging
-import pykakasi
 
 from typing import List
 from bs4 import BeautifulSoup
@@ -21,7 +20,6 @@ class ExampleParser:
         self.h2t = html2text.HTML2Text()
         self.h2t.ignore_emphasis = True
         self.h2t.ignore_tables = True
-        self.kks = pykakasi.kakasi()
 
     def parse_word(self, word: str) -> List[Example]:
         try:

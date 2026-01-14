@@ -1,5 +1,6 @@
 import os
 import logging
+import jaconv
 
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
@@ -8,7 +9,6 @@ from dotenv import load_dotenv
 from shared.database.db_session import init_db
 from shared.database.utils import get_by_word_and_reading, get_by_reading
 from shared.csv.utils import get_words
-from shared.kakashi.utils import get_hiragana
 from shared.regex.utils import has_kanji
 
 load_dotenv()
@@ -57,7 +57,7 @@ for word in words_to_parse[:10]:
 
     translations = None
     if has_kanji(word[0]):
-        reading = get_hiragana(word[2])
+        reading = jaconv.kata2hira(word[2])
         translations = [get_by_word_and_reading(word[0], reading)]
     else:
         translations = get_by_reading(reading)

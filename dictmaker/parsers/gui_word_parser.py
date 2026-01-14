@@ -1,8 +1,8 @@
 import logging
 import re
+import jaconv
 
 from typing import List
-from pykakasi import kakasi
 from pywinauto import Application
 from pywinauto.controls.uia_controls import ListViewWrapper
 from pywinauto.findwindows import ElementNotFoundError
@@ -15,18 +15,17 @@ class WordParserGUI:
         self.logger = logging.getLogger(__name__)
         try:
             self.app = Application(backend="uia").connect(
-                title_re=".*Jardic.*", timeout=2
+                title_re=".*Jardic Pro.*", timeout=2
             )
         except (ElementNotFoundError, Exception):
             self.logger.debug("App not found. Starting up...")
             Application(backend="uia").start(jardic_path)
             self.app = Application(backend="uia").connect(
-                title_re=".*Jardic.*", timeout=10
+                title_re=".*Jardic Pro.*", timeout=10
             )
 
         self.win = self.app.window(title_re=".*Jardic.*")
         self.win.wait("ready", timeout=10)
-        self.kks = kakasi()
 
         self.yarxi_pattern = r"^\[[a-zA-Z]+\]$"
 
@@ -103,14 +102,10 @@ class WordParserGUI:
 
             if re.match(self.yarxi_pattern, sents[1]):
                 word = sents[0]
-                reading = "".join(
-                    [
-                        item["kana"]
-                        for item in self.kks.convert(
-                            sents[1].replace("[", "").replace("]", "")
-                        )
-                    ]
+                reading = jaconv.alphabet2kana(
+                    sents[1].replace("[", "").replace("]", "")
                 )
+                strip = 2
 
             else:
                 reading = entry.splitlines()[0].strip()
@@ -120,7 +115,13 @@ class WordParserGUI:
                 else:
                     word = reading
 
-            senses = "\n".join(sents[strip:]).strip()
+            try:
+                empty_line_index = sents.index("", strip)
+                content_lines = sents[strip:empty_line_index]
+            except ValueError:
+                content_lines = sents[strip:]
+
+            senses = "\n".join(content_lines).strip()
             is_article_recur = senses.startswith("см. ") or " см. " in sents[strip:][0]
 
             if is_article_recur:
@@ -166,14 +167,7 @@ class WordParserGUI:
             return False
 
         if re.match(self.yarxi_pattern, lines[1]):
-            kana_line = "".join(
-                [
-                    item["kana"]
-                    for item in self.kks.convert(
-                        lines[1].replace("[", "").replace("]", "")
-                    )
-                ]
-            )
+            kana_line = jaconv.alphabet2kana(lines[1].replace("[", "").replace("]", ""))
             kanji_line = lines[0].split()[0] if has_kanji(lines[0]) else ""
             kana_variants = [kana_line]
             kanji_variants = [kanji_line.strip()]
@@ -185,8 +179,7 @@ class WordParserGUI:
 
         self.logger.debug(f"kana_variants {kana_variants}")
         self.logger.debug(f"kanji_variants {kanji_variants}")
-
-        reading = "".join([item["hira"] for item in self.kks.convert(kata)])
+        reading = jaconv.kata2hira(kata)
 
         self.logger.debug(f"Got reading {reading}")
 

@@ -1,5 +1,5 @@
 [project]
-name = "japvocrus"
+name = "rujpankideck"
 version = "0.1.0"
 description = "Root"
 readme = "README.md"
@@ -8,8 +8,8 @@ dependencies = [
     "anki>=25.9.2",
     "beautifulsoup4>=4.14.3",
     "html2text>=2025.4.15",
+    "jaconv>=0.4.1",
     "pydantic>=2.12.5",
-    "pykakasi>=2.3.0",
     "pytest>=9.0.2",
     "python-dotenv>=1.2.1",
     "pywinauto>=0.6.9",
