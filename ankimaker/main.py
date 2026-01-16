@@ -42,11 +42,11 @@ t2["afmt"] = RU_JP_BACK
 col.models.add_template(model, t2)
 col.models.add(model)
 
-words_to_parse = get_words()
+words_dict = {f"{w[0]}-{w[2]}": w for w in get_words()[:20000]}
 
 index = 0
 
-for word in words_to_parse[:10]:
+for word in words_dict.values():
     end_range = (index // 5000) * 5 + 5
     range_str = f"{end_range}k"
 
