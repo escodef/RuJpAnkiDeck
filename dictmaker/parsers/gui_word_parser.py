@@ -122,7 +122,12 @@ class WordParserGUI:
                 content_lines = sents[strip:]
 
             senses = "\n".join(content_lines).strip()
-            is_article_recur = senses.startswith("см. ") or " см. " in sents[strip:][0]
+            tail = sents[strip:]
+            is_article_recur = (
+                senses.startswith(("см.", "кн. см."))
+                or (len(tail) > 0 and " см. " in tail[0])
+                or (len(tail) > 1 and "англ." in tail[0] and " см. " in tail[1])
+            )
 
             if is_article_recur:
                 continue
@@ -138,10 +143,15 @@ class WordParserGUI:
         return ts
 
     def get_mainsense(self, article: str) -> str:
-        match = re.search(r"\d+[\.\)]:?\s+([^:\n]+)", article)
+        art_contain_numbered_list = re.search(r"\d+[\.\)]:?\s+([^:\n]+)", article)
 
-        if match:
-            senses = match.group(1).strip().split(";")
+        lines = article.split("\n")
+
+        if "2-я основа" in lines[0]:
+            article = "\n".join(lines[3:])
+
+        if art_contain_numbered_list:
+            senses = art_contain_numbered_list.group(1).strip().split(";")
         else:
             senses = article.split(";")
 

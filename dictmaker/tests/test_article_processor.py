@@ -261,6 +261,15 @@ def test_recursive_articles(parser):
         """かくしん　　
 閣臣
 уст. см. <<こくむだいじん>>.""",
+        """しゅくし　　
+祝詞
+кн. см.
+1) <<のりと>>;
+2) <<しゅくじ>>.""",
+        """ルビ　　　　
+(англ. ruby)
+1) см. <<ルビかつじ>>;
+2) см. <<ふりがな>>.""",
     ]
 
     results = parser.process_results(test_articles)
@@ -428,3 +437,100 @@ TN57062"""
     assert result.reading == "ひがしぐち"
     assert result.mainsense == "восточный вход (выход)"
     assert result.senses == "восточный вход (выход)"
+
+
+def test_godan_second_form_hottarakashi(parser):
+    test_articles = [
+        """ほったらかし
+2-я основа от:
+ほったらかす
+放ったらかす
+откладывать; забрасывать, бросать; оставлять (без внимания, присмотра)"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "ほったらかし"
+    assert result.reading == "ほったらかし"
+    assert result.mainsense == "откладывать"
+    assert (
+        result.senses
+        == """2-я основа от:
+ほったらかす
+放ったらかす
+откладывать; забрасывать, бросать; оставлять (без внимания, присмотра)"""
+    )
+
+
+def test_loanword_mangan(parser):
+    test_articles = [
+        """マンガン　　
+уст. 満俺
+(нем. Mangan) хим. марганец."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "マンガン"
+    assert result.reading == "マンガン"
+    assert result.mainsense == "хим. марганец."
+    assert (
+        result.senses
+        == """уст. 満俺
+(нем. Mangan) хим. марганец."""
+    )
+
+
+def test_loanword_furan(parser):
+    test_articles = [
+        """フラン　　　
+уст. 法
+франк."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "フラン"
+    assert result.reading == "フラン"
+    assert result.mainsense == "франк"
+    assert (
+        result.senses
+        == """уст. 法
+франк."""
+    )
+
+
+def test_onomatopoeia_article_potsuri(parser):
+    test_articles = [
+        """ぽつり　　　
+ономат.:
+ぽつりと一粒雨があたった на меня капнул дождь;
+ぽつりと星が一つ残っている на небе видна одинокая звезда."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "ぽつり"
+    assert result.reading == "ぽつり"
+    assert result.mainsense == "на меня капнул дождь"
+
+
+def test_onomatopoeia_article_gorogoro(parser):
+    test_articles = [
+        """ごろごろ　　
+ономат.
+1): ごろごろ言う音 грохот, грохотанье, тарахтенье;
+ごろごろ喉を鳴らす мурлыкать (о кошке);
+腹がごろごろ鳴る в животе урчит;
+ごろごろぴかぴか грохочет и сверкает (о громе и молнии);
+2): ～する бездельничать, болтаться [без дела] (о ком-л.); валяться [, где не следует] (о чём-л.);
+日曜をごろごろ暮らす провести всё воскресенье в безделье;
+英語の教師は口が無くて諸方にごろごろしていた из-за отсутствия мест преподаватели английского языка кое-где остались без дела;
+◇眼がごろごろする у кого-л. воспалённые глаза."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "ごろごろ"
+    assert result.reading == "ごろごろ"
+    assert result.mainsense == "грохот, грохотанье, тарахтенье"
