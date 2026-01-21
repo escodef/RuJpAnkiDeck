@@ -150,6 +150,9 @@ class WordParserGUI:
         if "2-я основа" in lines[0]:
             article = "\n".join(lines[3:])
 
+        if lines[0].startswith("уст."):
+            article = "\n".join(lines[1:])
+
         if art_contain_numbered_list:
             senses = art_contain_numbered_list.group(1).strip().split(";")
         else:

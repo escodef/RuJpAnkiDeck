@@ -473,7 +473,7 @@ def test_loanword_mangan(parser):
 
     assert result.word == "マンガン"
     assert result.reading == "マンガン"
-    assert result.mainsense == "хим. марганец."
+    assert result.mainsense == "(нем. Mangan) хим. марганец."
     assert (
         result.senses
         == """уст. 満俺
@@ -492,7 +492,7 @@ def test_loanword_furan(parser):
 
     assert result.word == "フラン"
     assert result.reading == "フラン"
-    assert result.mainsense == "франк"
+    assert result.mainsense == "франк."
     assert (
         result.senses
         == """уст. 法
