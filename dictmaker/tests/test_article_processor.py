@@ -207,7 +207,7 @@ def test_list_article_mame(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "まめ･忠実"
     assert first_res.reading == "まめ"
-    assert first_res.mainsense == "～な честный, преданный"
+    assert first_res.mainsense == "честный, преданный"
     assert (
         first_res.senses
         == """1): ～な честный, преданный;
@@ -233,7 +233,7 @@ def test_list_article_jun(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "純"
     assert first_res.reading == "じゅん"
-    assert first_res.mainsense == "～な чистый, незапятнанный"
+    assert first_res.mainsense == "чистый, незапятнанный"
 
 
 def test_date_chouwa(parser):
@@ -290,7 +290,7 @@ def test_colon_kaikan(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "開罐･開缶"
     assert first_res.reading == "かいかん"
-    assert first_res.mainsense == "～する открывать банку (напр. консервов)."
+    assert first_res.mainsense == "открывать банку (напр. консервов)."
 
 
 def test_colon_shoukei(parser):
@@ -306,7 +306,7 @@ def test_colon_shoukei(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "小慧"
     assert first_res.reading == "しょうけい"
-    assert first_res.mainsense == "～の кн. толковый, смышлёный."
+    assert first_res.mainsense == "кн. толковый, смышлёный."
 
 
 def test_nonstandard_boudai(parser):
@@ -324,7 +324,7 @@ def test_nonstandard_boudai(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "厖大"
     assert first_res.reading == "ぼうだい"
-    assert first_res.mainsense == "～な огромный, громадный"
+    assert first_res.mainsense == "огромный, громадный"
 
 
 def test_nonstandard_kakaru(parser):
@@ -534,3 +534,41 @@ def test_onomatopoeia_article_gorogoro(parser):
     assert result.word == "ごろごろ"
     assert result.reading == "ごろごろ"
     assert result.mainsense == "грохот, грохотанье, тарахтенье"
+
+
+def test_nonstandart_article(parser):
+    test_articles = [
+        """こころまち　
+心待ち
+связ.: 心待ちに待つ ждать с нетерпением, ждать не дождаться, быть в страстном ожидани"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "心待ち"
+    assert result.reading == "こころまち"
+    assert (
+        result.mainsense
+        == "ждать с нетерпением, ждать не дождаться, быть в страстном ожидани"
+    )
+
+
+def test_bad_newline_article(parser):
+    test_articles = [
+        """てうち　　　
+手打ち
+1) уст.:
+～にする убить самолично (своей собственной рукой);
+お手打ちになる(合う) быть убитым своим господином, умереть от меча своего хозяина;
+2) заключение сделки;
+～にする ударить по рукам;
+もう手打ちになりました сделка уже заключена;
+3) примирение;
+4): ～[の] собственного (ручного) изготовления (о лапше и т. п.)."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "手打ち"
+    assert result.reading == "てうち"
+    assert result.mainsense == "убить самолично (своей собственной рукой)"

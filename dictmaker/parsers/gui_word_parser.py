@@ -143,29 +143,37 @@ class WordParserGUI:
         return ts
 
     def get_mainsense(self, article: str) -> str:
-        art_contain_numbered_list = re.search(r"\d+[\.\)]:?\s+([^:\n]+)", article)
+        jap_pattern = r"^[ ～\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+\s*"
 
         lines = article.split("\n")
 
         if "2-я основа" in lines[0]:
             article = "\n".join(lines[3:])
 
-        if lines[0].startswith("уст."):
+        if "уст." in lines[0] or "сущ." in lines[0] or "ономат." in lines[0]:
             article = "\n".join(lines[1:])
 
+        art_contain_numbered_list = re.search(r"\d+[\.\)]:?\s+([^:\n]+)", article)
+
         if art_contain_numbered_list:
-            senses = art_contain_numbered_list.group(1).strip().split(";")
+            senses = re.split(r"\d+[\.\)]:?\s*", article.strip())
+            senses = [p.strip(" ;\n") for p in senses if p.strip()]
+            senses = [item.strip(" ;\n") for s in senses for item in s.split(";")]
         else:
             senses = article.split(";")
 
-        part = senses[0].strip()
-        result = part.partition(":")[-1].strip() or part.strip()
+        part = senses[0].strip("\n")
+        result = part.partition(":")[-1].strip(" ;\n") or part.strip(" ;\n")
+        result = re.sub(jap_pattern, "", result)
         i = 1
+
         while i < len(senses):
             part = senses[i].strip()
+            part = part.partition(":")[-1].strip(" ;\n") or part.strip(" ;\n")
+            part = re.sub(jap_pattern, "", part)
             if len(result + part) > 25 or not part:
                 break
-            result = result + ", " + (part.partition(":")[-1].strip() or part.strip())
+            result = result + ", " + part
             i = i + 1
 
         return (
