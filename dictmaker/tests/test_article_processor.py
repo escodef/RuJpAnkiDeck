@@ -9,7 +9,10 @@ from models.models import Translation
 def parser():
     obj = WordParserGUI.__new__(WordParserGUI)
     obj.yarxi_re = re.compile(r"^\[[a-zA-Z]+\]$")
-    obj.jap_re = re.compile(r"^[ ～\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+\s*")
+    obj.jap_re = re.compile(
+        r"^[^\s\w]*[\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF\s,]+",
+        re.UNICODE,
+    )
     obj.list_re = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
 
     return obj
@@ -84,7 +87,7 @@ def test_basic_article_shindan(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "診断"
     assert first_res.reading == "しんだん"
-    assert first_res.mainsense == "диагноз"
+    assert first_res.mainsense == "диагноз, ставить диагноз"
 
 
 def test_basic_article_iu(parser):
@@ -167,7 +170,7 @@ def test_list_article_tokoro(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "所I･処"
     assert first_res.reading == "ところ"
-    assert first_res.mainsense == "место"
+    assert first_res.mainsense == "место, находиться где-л."
 
 
 def test_list_article_dzukuri(parser):
@@ -575,3 +578,18 @@ def test_bad_newline_article(parser):
     assert result.word == "手打ち"
     assert result.reading == "てうち"
     assert result.mainsense == "убить самолично (своей собственной рукой)"
+
+
+def test_letter_list_article(parser):
+    test_articles = [
+        """なのり　　　
+名乗り
+: ～をする, 名乗りをあげる а) называть себя, представляться; б) назваться кем-л.;
+…の親類の名乗りをする назваться чьим-л. родственником; в) выставлять свою кандидатуру (на выборах и т. п.)."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "名乗り"
+    assert result.reading == "なのり"
+    assert result.mainsense == "называть себя, представляться"

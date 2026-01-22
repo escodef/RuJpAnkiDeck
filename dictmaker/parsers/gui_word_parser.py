@@ -28,7 +28,10 @@ class WordParserGUI:
         self.win.wait("ready", timeout=10)
 
         self.yarxi_re = re.compile(r"^\[[a-zA-Z]+\]$")
-        self.jap_re = re.compile(r"^[ ～\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+\s*")
+        self.jap_re = re.compile(
+            r"^[^\s\w]*[\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF\s,]+",
+            re.UNICODE,
+        )
         self.list_re = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
 
     def switch_tab(self, tab_index: int):
@@ -153,9 +156,9 @@ class WordParserGUI:
         if "уст." in lines[0] or "сущ." in lines[0] or "ономат." in lines[0]:
             article = "\n".join(lines[1:])
 
-        art_contain_numbered_list = self.list_re.search(article)
+        art_contain_list = self.list_re.search(article)
 
-        if art_contain_numbered_list:
+        if art_contain_list:
             senses = re.split(r"\d+[\.\)]:?\s*", article.strip())
             senses = [p.strip(" ;\n") for p in senses if p.strip()]
             senses = [item.strip(" ;\n") for s in senses for item in s.split(";")]
