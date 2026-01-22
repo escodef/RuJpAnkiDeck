@@ -27,7 +27,9 @@ class WordParserGUI:
         self.win = self.app.window(title_re=".*Jardic.*")
         self.win.wait("ready", timeout=10)
 
-        self.yarxi_pattern = r"^\[[a-zA-Z]+\]$"
+        self.yarxi_re = re.compile(r"^\[[a-zA-Z]+\]$")
+        self.jap_re = re.compile(r"^[ ～\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+\s*")
+        self.list_re = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
 
     def switch_tab(self, tab_index: int):
         tab_ctrl = self.win.child_window(control_type="Tab")
@@ -100,7 +102,7 @@ class WordParserGUI:
             sents = entry.split("\n")
             strip = 1
 
-            if re.match(self.yarxi_pattern, sents[1]):
+            if self.yarxi_re.match(sents[1]):
                 word = sents[0]
                 reading = jaconv.alphabet2kana(
                     sents[1].replace("[", "").replace("]", "")
@@ -143,8 +145,6 @@ class WordParserGUI:
         return ts
 
     def get_mainsense(self, article: str) -> str:
-        jap_pattern = r"^[ ～\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+\s*"
-
         lines = article.split("\n")
 
         if "2-я основа" in lines[0]:
@@ -153,7 +153,7 @@ class WordParserGUI:
         if "уст." in lines[0] or "сущ." in lines[0] or "ономат." in lines[0]:
             article = "\n".join(lines[1:])
 
-        art_contain_numbered_list = re.search(r"\d+[\.\)]:?\s+([^:\n]+)", article)
+        art_contain_numbered_list = self.list_re.search(article)
 
         if art_contain_numbered_list:
             senses = re.split(r"\d+[\.\)]:?\s*", article.strip())
@@ -164,13 +164,13 @@ class WordParserGUI:
 
         part = senses[0].strip("\n")
         result = part.partition(":")[-1].strip(" ;\n") or part.strip(" ;\n")
-        result = re.sub(jap_pattern, "", result)
+        result = re.sub(self.jap_re, "", result)
         i = 1
 
         while i < len(senses):
             part = senses[i].strip()
             part = part.partition(":")[-1].strip(" ;\n") or part.strip(" ;\n")
-            part = re.sub(jap_pattern, "", part)
+            part = re.sub(self.jap_re, "", part)
             if len(result + part) > 25 or not part:
                 break
             result = result + ", " + part
@@ -187,7 +187,7 @@ class WordParserGUI:
         if not lines:
             return False
 
-        if re.match(self.yarxi_pattern, lines[1]):
+        if self.yarxi_re.match(lines[1]):
             kana_line = jaconv.alphabet2kana(lines[1].replace("[", "").replace("]", ""))
             kanji_line = lines[0].split()[0] if has_kanji(lines[0]) else ""
             kana_variants = [kana_line]

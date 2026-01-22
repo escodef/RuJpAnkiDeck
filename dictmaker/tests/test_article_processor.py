@@ -1,4 +1,5 @@
 import pytest
+import re
 
 from parsers.gui_word_parser import WordParserGUI
 from models.models import Translation
@@ -7,7 +8,9 @@ from models.models import Translation
 @pytest.fixture
 def parser():
     obj = WordParserGUI.__new__(WordParserGUI)
-    obj.yarxi_pattern = r"^\[[a-zA-Z]+\]$"
+    obj.yarxi_re = re.compile(r"^\[[a-zA-Z]+\]$")
+    obj.jap_re = re.compile(r"^[ ～\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+\s*")
+    obj.list_re = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
 
     return obj
 
