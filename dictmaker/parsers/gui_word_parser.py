@@ -17,6 +17,7 @@ class WordParserGUI:
         re.UNICODE,
     )
     LIST_RE = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
+    LETTER_LIST_RE = re.compile(r"^[а-яёA-Za-z]\)\s?")
 
     def __init__(self, jardic_path: str):
         self.logger = logging.getLogger(__name__)
@@ -165,12 +166,12 @@ class WordParserGUI:
         else:
             senses = article.split(";")
 
-        print(senses)
-
         part = senses[0].strip("\n")
         result = part.partition(":")[-1].strip(" ;\n") or part.strip(" ;\n")
         result = re.sub(self.JAP_RE, "", result)
+        result = re.sub(self.LETTER_LIST_RE, "", result)
         i = 1
+        print(result)
 
         while i < len(senses):
             part = senses[i].strip()
