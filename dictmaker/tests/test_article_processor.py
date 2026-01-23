@@ -586,3 +586,48 @@ def test_letter_list_article(parser):
     assert result.word == "名乗り"
     assert result.reading == "なのり"
     assert result.mainsense == "называть себя, представляться"
+
+
+def test_loanword_centimetre(parser):
+    test_articles = [
+        """センチメートル　
+уст. 珊
+(англ. centimetre) сантиметр."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "センチメートル"
+    assert result.reading == "センチメートル"
+    assert result.mainsense == "(англ. centimetre) сантиметр."
+
+
+def test_recursive_yuke(parser):
+    test_articles = [
+        """ゆけ　　　　
+湯気
+связ.: 湯気にあたる почувствовать себя плохо от слишком горячей ванны."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "湯気"
+    assert result.reading == "ゆけ"
+    assert result.mainsense == "почувствовать себя плохо от слишком горячей ванны."
+
+
+def test_really_bad_article(parser):
+    test_articles = [
+        """カルタ　　　
+уст. 歌留多, 加留多, 骨牌
+(португ. carta) [игральные] карты;
+カルタ一組 колода карт;
+カルタをやる(取る) играть в карты;
+骨牌を切る тасовать карты."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "カルタ"
+    assert result.reading == "カルタ"
+    assert result.mainsense == "(португ. carta) [игральные] карты"
