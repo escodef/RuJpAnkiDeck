@@ -1,6 +1,7 @@
 import os
 import logging
 import jaconv
+import shutil
 
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
@@ -42,23 +43,24 @@ t2["afmt"] = RU_JP_BACK
 col.models.add_template(model, t2)
 col.models.add(model)
 
-words_dict = {f"{w[0]}-{w[2]}": w for w in get_words()[:20000]}
+words_dict = {f"{w[0]}-{w[2]}": w for w in get_words()[:21000]}
 
-index = 0
+index = 1
 
 for word in words_dict.values():
+    if index > 20000:
+        break
     end_range = (index // 5000) * 5 + 5
     range_str = f"{end_range}k"
 
     current_deck_id_jp = col.decks.id(f"Слова::Японский - Русский::{range_str}")
     current_deck_id_ru = col.decks.id(f"Слова::Русский - Японский::{range_str}")
 
-    reading = ""
-
+    reading = jaconv.kata2hira(word[2])
     translations = None
     if has_kanji(word[0]):
-        reading = jaconv.kata2hira(word[2])
-        translations = [get_by_word_and_reading(word[0], reading)]
+        res = get_by_word_and_reading(word[0], reading)
+        translations = [res] if res is not None else []
     else:
         translations = get_by_reading(reading)
 
@@ -109,5 +111,7 @@ if os.path.exists(temp_db):
     os.remove(temp_db)
 if os.path.exists(temp_db + ".log"):
     os.remove(temp_db + ".log")
+if os.path.exists("temp_col.media"):
+    shutil.rmtree("temp_col.media")
 
 print(f"Готово! Файл создан: {output_file}")

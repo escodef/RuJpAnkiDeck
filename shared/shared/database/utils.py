@@ -118,12 +118,12 @@ def get_by_word(word: str) -> TranslationTable | None:
 def get_by_reading(reading: str, limit=3) -> list[TranslationTable]:
     session = SessionLocal()
     try:
-        pattern_start = f"{reading}・%"
-        pattern_end = f"%・{reading}"
         pattern_middle = f"%・{reading}・%"
-        pattern_start_spaced = f"{reading} ・%"
-        pattern_end_spaced = f"%・ {reading}"
         pattern_middle_spaced = f"%・ {reading} ・%"
+        pattern_end = f"%・{reading}"
+        pattern_end_spaced = f"%・ {reading}"
+        pattern_start_spaced = f"{reading} ・%"
+        pattern_start = f"{reading}・%"
 
         results = (
             session.query(TranslationTable)
