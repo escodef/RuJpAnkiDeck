@@ -163,7 +163,7 @@ def test_list_article_tokoro(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "所I･処"
     assert first_res.reading == "ところ"
-    assert first_res.mainsense == "место, находиться где-л."
+    assert first_res.mainsense == "место, находиться где-л"
 
 
 def test_list_article_dzukuri(parser):
@@ -180,7 +180,7 @@ def test_list_article_dzukuri(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "…造り"
     assert first_res.reading == "…づくり"
-    assert first_res.mainsense == "построенный из чего-л."
+    assert first_res.mainsense == "построенный из чего-л"
     assert (
         first_res.senses
         == """построенный из чего-л.;
@@ -289,7 +289,7 @@ def test_colon_kaikan(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "開罐･開缶"
     assert first_res.reading == "かいかん"
-    assert first_res.mainsense == "открывать банку (напр. консервов)."
+    assert first_res.mainsense == "открывать банку (напр. консервов)"
 
 
 def test_colon_shoukei(parser):
@@ -305,10 +305,10 @@ def test_colon_shoukei(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "小慧"
     assert first_res.reading == "しょうけい"
-    assert first_res.mainsense == "кн. толковый, смышлёный."
+    assert first_res.mainsense == "кн. толковый, смышлёный"
 
 
-def test_nonstandard_boudai(parser):
+def test_with_footnote_boudai(parser):
     test_articles = [
         """ぼうだい　　
 厖大
@@ -339,7 +339,7 @@ def test_nonstandard_kakaru(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "かかる"
     assert first_res.reading == "かかる"
-    assert first_res.mainsense == "начинается..., вот-вот..., почти..., чуть не..."
+    assert first_res.mainsense == "начинается..., вот-вот..., почти..., чуть не"
 
 
 def test_recursive_good(parser):
@@ -472,7 +472,7 @@ def test_loanword_mangan(parser):
 
     assert result.word == "マンガン"
     assert result.reading == "マンガン"
-    assert result.mainsense == "(нем. Mangan) хим. марганец."
+    assert result.mainsense == "(нем. Mangan) хим. марганец"
     assert (
         result.senses
         == """уст. 満俺
@@ -491,7 +491,7 @@ def test_loanword_furan(parser):
 
     assert result.word == "フラン"
     assert result.reading == "フラン"
-    assert result.mainsense == "франк."
+    assert result.mainsense == "франк"
     assert (
         result.senses
         == """уст. 法
@@ -573,7 +573,7 @@ def test_bad_newline_article(parser):
     assert result.mainsense == "убить самолично (своей собственной рукой)"
 
 
-def test_letter_list_article(parser):
+def test_letter_list_article_nanori(parser):
     test_articles = [
         """なのり　　　
 名乗り
@@ -588,6 +588,22 @@ def test_letter_list_article(parser):
     assert result.mainsense == "называть себя, представляться"
 
 
+def test_letter_list_article_tsuki(parser):
+    test_articles = [
+        """つき　　　　
+付きI
+сущ. связ.:
+付きが良い а) хорошо сидеть (об одежде); хорошо ложиться (напр. о краске, пудре); не расплываться (о чернилах); хорошо отпечатываться; легко загораться (о топливе); б) быть приятным человеком;
+付きの悪い人 несимпатичный человек."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "付きI"
+    assert result.reading == "つき"
+    assert result.mainsense == "хорошо сидеть (об одежде)"
+
+
 def test_loanword_centimetre(parser):
     test_articles = [
         """センチメートル　
@@ -599,7 +615,7 @@ def test_loanword_centimetre(parser):
 
     assert result.word == "センチメートル"
     assert result.reading == "センチメートル"
-    assert result.mainsense == "(англ. centimetre) сантиметр."
+    assert result.mainsense == "(англ. centimetre) сантиметр"
 
 
 def test_recursive_yuke(parser):
@@ -613,7 +629,7 @@ def test_recursive_yuke(parser):
 
     assert result.word == "湯気"
     assert result.reading == "ゆけ"
-    assert result.mainsense == "почувствовать себя плохо от слишком горячей ванны."
+    assert result.mainsense == "почувствовать себя плохо от слишком горячей ванны"
 
 
 def test_really_bad_article(parser):
@@ -631,3 +647,105 @@ def test_really_bad_article(parser):
     assert result.word == "カルタ"
     assert result.reading == "カルタ"
     assert result.mainsense == "(португ. carta) [игральные] карты"
+
+
+def test_really_bad_article_hitoshii(parser):
+    test_articles = [
+        """ひとしい　　
+等しい･均しい･斉しい
+равный; одинаковый, такой же;
+彼等は年が等しい они одних лет, они одного возраста;
+この二つは全然等しい эти две вещи совершенно одинаковы (равны);
+等しく分配する распределять поровну;
+一里は12.960尺に等しい одно ри равно 12.960 ся́ку;
+彼は死人に等しい он всё равно что мёртвый."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "等しい･均しい･斉しい"
+    assert result.reading == "ひとしい"
+    assert result.mainsense == "равный"
+
+
+def test_article_with_footnote_chiken(parser):
+    test_articles = [
+        """ちけん　　　
+地検
+(сокр. 地方検事局) районная прокуратура."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "地検"
+    assert result.reading == "ちけん"
+    assert result.mainsense == "районная прокуратура"
+
+
+def test_really_bad_article_banzen(parser):
+    test_articles = [
+        """ばんぜん　　
+万全
+связ.:
+万全を期するため для полной гарантии, для верности;
+～の надёжный, верный; безопасный;
+万全の策 все меры; надёжные (эффективные) меры; предусмотрительная политика."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "万全"
+    assert result.reading == "ばんぜん"
+    assert result.mainsense == "для полной гарантии, для верности"
+
+
+def test_really_bad_article_sameru(parser):
+    test_articles = [
+        """さめる　　　
+覚める･醒める
+связ.:
+[目が]覚める просыпаться, пробуждаться; очнуться;
+目がさめている時 когда кто-л. на ногах (не спит);
+目のさめるような美人 ослепительная красавица;
+迷いがさめる очнуться от иллюзий; раскрыть глаза на что-л.; прийти в себя;
+酔いが醒める протрезвиться."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "覚める･醒める"
+    assert result.reading == "さめる"
+    assert result.mainsense == "просыпаться, пробуждаться"
+
+
+def test_really_bad_article_ryokai(parser):
+    test_articles = [
+        """りょうかい　
+了解･諒解I
+уст. 領会, 領解
+понимание;
+～する понимать;
+了解し難い непонятный;
+了解し得る понятный;
+我々の了解する所では насколько мы понимаем."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "了解･諒解I"
+    assert result.reading == "りょうかい"
+    assert result.mainsense == "понимание, понимать"
+
+
+def test_really_bad_article_eibun(parser):
+    test_articles = [
+        """えいぶん　　
+叡聞
+связ.: 叡聞に達する довести до сведения императора."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "叡聞"
+    assert result.reading == "えいぶん"
+    assert result.mainsense == "довести до сведения императора"
