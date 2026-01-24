@@ -2,6 +2,7 @@ import os
 import logging
 import jaconv
 import shutil
+import hashlib
 
 from anki.collection import Collection
 from anki.exporting import AnkiPackageExporter
@@ -16,6 +17,9 @@ load_dotenv()
 
 tts_folder = os.getenv("TTS_OUTPUT_FOLDER")
 
+def generate_guid(word, reading):
+    return hashlib.md5(f"{word}{reading}".encode()).hexdigest()
+
 init_db()
 
 temp_db = "temp_col.anki2"
@@ -24,11 +28,14 @@ if os.path.exists(temp_db):
 
 col = Collection(temp_db)
 
-model = col.models.new("Japanese_Model")
-col.models.add_field(model, col.models.new_field("Word"))
-col.models.add_field(model, col.models.new_field("Reading"))
-col.models.add_field(model, col.models.new_field("MainSense"))
-col.models.add_field(model, col.models.new_field("Senses"))
+model = col.models.by_name("rujpankideck")
+
+if not model:
+    model = col.models.new("rujpankideck")
+    col.models.add_field(model, col.models.new_field("Word"))
+    col.models.add_field(model, col.models.new_field("Reading"))
+    col.models.add_field(model, col.models.new_field("MainSense"))
+    col.models.add_field(model, col.models.new_field("Senses"))
 
 model["css"] = CARD_CSS
 
@@ -43,7 +50,7 @@ t2["afmt"] = RU_JP_BACK
 col.models.add_template(model, t2)
 col.models.add(model)
 
-words_dict = {f"{w[0]}-{w[2]}": w for w in get_words()[:21000]}
+words_dict = {f"{w[0]}-{w[2]}": w for w in get_words()[:1000]}
 
 index = 1
 
@@ -65,7 +72,7 @@ for word in words_dict.values():
         translations = get_by_reading(reading)
 
     if not translations:
-        logging.warning(f"translations not found for {word}")
+        logging.warning(f"translations not found for {word[0]} with reading {word[2]}")
         continue
 
     for translation in translations:
@@ -82,7 +89,8 @@ for word in words_dict.values():
         )
 
         note = col.new_note(model)
-        note["Word"] = word_val
+        note.guid = generate_guid()
+        note["Word"] = word_val(word_val, reading)
         note["Reading"] = reading
         note["MainSense"] = mainsense
         note["Senses"] = senses

@@ -65,3 +65,15 @@ TN57062"""
     result = parser.is_article_correct(test_article, "東口", "ヒガシグチ")
 
     assert result is True
+
+
+def test_yarxi_simple_article_mosu(parser):
+    test_article = """燃す
+[mosu]
+см. 燃やす [moyasu]
+
+TN69217"""
+
+    result = parser.is_article_correct(test_article, "モス", "モス")
+
+    assert result is True
