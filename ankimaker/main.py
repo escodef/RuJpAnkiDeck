@@ -50,7 +50,7 @@ t2["afmt"] = RU_JP_BACK
 col.models.add_template(model, t2)
 col.models.add(model)
 
-words_dict = {f"{w[0]}-{w[2]}": w for w in get_words()[:1000]}
+words_dict = {f"{w[0]}-{w[2]}": w for w in get_words()[:21000]}
 
 index = 1
 
@@ -89,8 +89,8 @@ for word in words_dict.values():
         )
 
         note = col.new_note(model)
-        note.guid = generate_guid()
-        note["Word"] = word_val(word_val, reading)
+        note.guid = generate_guid(word_val, reading)
+        note["Word"] = word_val
         note["Reading"] = reading
         note["MainSense"] = mainsense
         note["Senses"] = senses
