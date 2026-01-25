@@ -764,3 +764,32 @@ def test_really_bad_article_koukaku(parser):
     assert result.reading == "こうかく"
     assert result.mainsense == "с пеной у рта, горячо, страстно (спорить и т. п.)"
 
+
+def test_yarxi_simple_article_speedup(parser):
+    test_articles = [
+        """スピードアップ
+[supi:do-appu]
+повышение скорости (англ. speedup); ~suru повышать скорость; антоним スピードダウン
+
+TN36589"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "スピードアップ"
+    assert result.reading == "すぴーどあっぷ"
+    assert result.mainsense == "повышение скорости (англ. speedup)"
+
+
+def test_yarxi_double_reading(parser):
+    test_articles = [
+        """墨色
+[sumiiro], [bokushoku]
+цвет (оттенок) туши"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "墨色"
+    assert result.reading == "すみいろ"
+    assert result.mainsense == "цвет (оттенок) туши"

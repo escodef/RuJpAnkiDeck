@@ -58,7 +58,7 @@ for word in words_dict.values():
     if index > 20000:
         break
     end_range = (index // 5000) * 5 + 5
-    range_str = f"{end_range}k"
+    range_str = f"{end_range:02}k"
 
     current_deck_id_jp = col.decks.id(f"Слова::Японский - Русский::{range_str}")
     current_deck_id_ru = col.decks.id(f"Слова::Русский - Японский::{range_str}")
