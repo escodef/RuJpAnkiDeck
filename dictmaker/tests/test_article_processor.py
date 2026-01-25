@@ -749,3 +749,18 @@ def test_really_bad_article_eibun(parser):
     assert result.word == "叡聞"
     assert result.reading == "えいぶん"
     assert result.mainsense == "довести до сведения императора"
+
+
+def test_really_bad_article_koukaku(parser):
+    test_articles = [
+        """こうかく　　
+口角
+связ.: 口角泡/アワ/を飛ばして с пеной у рта, горячо, страстно (спорить и т. п.)."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "口角"
+    assert result.reading == "こうかく"
+    assert result.mainsense == "с пеной у рта, горячо, страстно (спорить и т. п.)"
+

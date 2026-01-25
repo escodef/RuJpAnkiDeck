@@ -13,7 +13,7 @@ from shared.regex.utils import has_cyrillic, has_kanji, split_by_dots
 class WordParserGUI:
     JAP_LETTERS = r"\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF"
     YARXI_RE = re.compile(r"^\[[a-zA-Z]+\]$")
-    JAP_RE = re.compile(rf"^[^\s\w]*[\[\]{JAP_LETTERS}\s,]+", re.UNICODE)
+    JAP_RE = re.compile(rf"^[^\s\w]*[\[\]\/{JAP_LETTERS}\s,]+", re.UNICODE)
     LIST_RE = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
     LETTER_LIST_RE = re.compile(r"^[а-яёA-Za-z]\)\s?")
     JAP_IN_BRACKETS_RE = re.compile(rf"\(.*?[{JAP_LETTERS}].*?\)|\[{JAP_LETTERS}].*?\]")
