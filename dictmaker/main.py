@@ -10,7 +10,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("logs/parser.log", encoding="utf-8"),
+        logging.FileHandler("dictmaker/logs/parser.log", encoding="utf-8"),
         logging.StreamHandler(),
     ],
 )

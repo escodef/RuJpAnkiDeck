@@ -56,6 +56,7 @@ index = 1
 
 for word in words_dict.values():
     if index > 20000:
+        logging.info("20000 words found")
         break
     end_range = (index // 5000) * 5 + 5
     range_str = f"{end_range:02}k"

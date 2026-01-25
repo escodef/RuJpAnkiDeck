@@ -53,7 +53,7 @@ class WordParserGUI:
             input_box = self.win.child_window(auto_id="202", control_type="Edit")
             input_box.set_edit_text("")
 
-            tab_idx = 2 if has_kanji(word) else 1
+            tab_idx = 3 if has_kanji(word) else 2
             self.switch_tab(tab_idx)
             input_box.type_keys(word, with_spaces=True)
             pane = self.win.child_window(control_id=201)

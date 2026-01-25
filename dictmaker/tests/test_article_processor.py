@@ -793,3 +793,22 @@ def test_yarxi_double_reading(parser):
     assert result.word == "墨色"
     assert result.reading == "すみいろ"
     assert result.mainsense == "цвет (оттенок) туши"
+
+
+def test_bad_article_sashikomu(parser):
+    test_articles = [
+        """さしこむ　　
+差し込む･差込む
+1) (тж. 挿し込む, 插し込む) вкладывать, вставлять;
+新聞の中へ広告を差し込む помещать объявление в газете;
+2) чувствовать острую (спазматическую) боль;
+急に腹が差し込む у меня вдруг появилась острая боль в желудке;
+横腹が差し込む колет в боку."""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "差し込む･差込む"
+    assert result.reading == "さしこむ"
+    assert result.mainsense == "вкладывать, вставлять"
+
