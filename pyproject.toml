@@ -19,11 +19,11 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.5",
+    "ruff>=0.15.6",
 ]
 
 [tool.uv.workspace]
-members = ["ankimaker", "dictmaker", "shared"]
+members = ["ankimaker", "dictmaker",  "tts", "shared"]
 
 [tool.uv]
 cache-dir = "./.uv_cache"
