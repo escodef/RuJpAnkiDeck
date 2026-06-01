@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 load_dotenv()
 
-db_path = os.getenv("DB_PATH", "dictionary.db")
+db_path = os.getenv("DB_PATH", "./data/dictionary.db")
 engine = create_engine(f"sqlite:///{db_path}")
 SessionLocal = sessionmaker(bind=engine)
 

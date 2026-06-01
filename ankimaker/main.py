@@ -15,7 +15,7 @@ from shared.regex.utils import has_kanji
 
 load_dotenv()
 
-tts_folder = os.getenv("TTS_OUTPUT_FOLDER", "/")
+tts_folder = os.getenv("TTS_OUTPUT_FOLDER", "output")
 
 
 def generate_guid(word, reading):

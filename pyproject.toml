@@ -6,10 +6,12 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "anki>=25.9.4",
+    "audioop-lts>=0.2.2",
     "beautifulsoup4>=4.14.3",
     "html2text>=2025.4.15",
     "jaconv>=0.5.0",
     "pydantic>=2.13.4",
+    "pydub>=0.25.1",
     "pykakasi>=2.3.0",
     "pytest>=9.0.3",
     "python-dotenv>=1.2.2",

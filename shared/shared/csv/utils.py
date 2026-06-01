@@ -3,7 +3,7 @@ import csv
 
 from typing import List
 
-csv_path = os.getenv("CSV_FILE", "freq_list.csv")
+csv_path = os.getenv("CSV_FILE", "./data/freq_list.csv")
 
 filter = ["助動詞", "記号", "動詞-接尾", "助詞"]
 
