@@ -1,6 +1,7 @@
+from typing import Iterator
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from dotenv import load_dotenv
 from contextlib import contextmanager
 
@@ -18,8 +19,8 @@ def init_db():
 
 
 @contextmanager
-def get_session():
-    session = SessionLocal()
+def get_session() -> Iterator[Session]:
+    session: Session = SessionLocal()
     try:
         yield session
         session.commit()

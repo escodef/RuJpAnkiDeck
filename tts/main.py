@@ -14,9 +14,10 @@ load_dotenv()
 Logger = getLogger(__name__)
 
 OUTPUT_DIR = os.getenv("TTS_OUTPUT_FOLDER", "output")
+BATCH_SIZE = int(os.getenv("TTS_BATCH_SIZE", 8))
+SPEAKER_ID = int(os.getenv("TTS_SPEAKER_ID", 13))
+
 VOICEVOX_URL = "http://127.0.0.1:50021"
-SPEAKER_ID = 13
-BATCH_SIZE = 5
 
 
 def main():

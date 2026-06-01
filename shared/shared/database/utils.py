@@ -1,9 +1,10 @@
-from .models import TranslationTable, ExampleTable, NotFoundTable
-from .db_session import get_session
 from sqlalchemy import or_
 
+from .db_session import get_session
+from .models import ExampleTable, NotFoundTable, TranslationTable
 
-def save_to_sqlite(dictionary):
+
+def save_to_sqlite(dictionary: list) -> None:
     with get_session() as session:
         for item in dictionary:
             db_translation = TranslationTable(
@@ -20,7 +21,7 @@ def save_to_sqlite(dictionary):
             session.add(db_translation)
 
 
-def add_not_found(word, reading):
+def add_not_found(word: str, reading: str) -> None:
     with get_session() as session:
         db_translation = NotFoundTable(
             word=word,
@@ -29,7 +30,7 @@ def add_not_found(word, reading):
         session.add(db_translation)
 
 
-def get_not_found(word, reading):
+def get_not_found(word: str, reading: str) -> NotFoundTable | None:
     with get_session() as session:
         result = (
             session.query(NotFoundTable)
@@ -89,7 +90,7 @@ def get_by_word(word: str) -> TranslationTable | None:
         return results
 
 
-def get_by_reading(reading: str, limit=3) -> list[TranslationTable]:
+def get_by_reading(reading: str, limit: int = 3) -> list[TranslationTable]:
     with get_session() as session:
         pattern_middle = f"%・{reading}・%"
         pattern_middle_spaced = f"%・ {reading} ・%"

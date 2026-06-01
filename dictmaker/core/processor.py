@@ -21,8 +21,8 @@ from parsers.gui_word_parser import WordParserGUI
 
 load_dotenv()
 
-dict_url = os.getenv("DICT_URL")
-jardic_path = os.getenv("JARDIC_PATH")
+dict_url = os.getenv("DICT_URL", "https://www.jardic.ru/search/search_r.php")
+jardic_path = os.getenv("JARDIC_PATH", "C:\Program Files (x86)\JardicPro\JardicPro.exe")
 
 
 class DictionaryProcessor:
@@ -65,10 +65,9 @@ class DictionaryProcessor:
             clean_reading = new_reading.strip("…")
             seen_set.add((clean_word, clean_reading))
 
-    def is_word_parsed(self, word, reading_kata, index):
+    def is_word_parsed(self, word, reading_kata, index) -> bool:
         if index in self.parsed_indexes:
             return True
-        exists = None
         reading = jaconv.kata2hira(reading_kata)
         if has_kanji(word):
             exists = get_by_word_and_reading(word, reading)

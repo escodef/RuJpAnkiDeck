@@ -3,7 +3,7 @@ import re
 import jaconv
 
 from typing import List
-from pywinauto import Application
+from pywinauto import Application, WindowSpecification
 from pywinauto.controls.uia_controls import ListViewWrapper
 from pywinauto.findwindows import ElementNotFoundError
 from models.models import Translation
@@ -25,17 +25,17 @@ class WordParserGUI:
         self.example_parser = ExampleParser()
 
         try:
-            self.app = Application(backend="uia").connect(
+            self.app: Application = Application(backend="uia").connect(
                 title_re=".*Jardic Pro.*", timeout=2
             )
         except ElementNotFoundError, Exception:
             self.logger.debug("App not found. Starting up...")
             Application(backend="uia").start(jardic_path)
-            self.app = Application(backend="uia").connect(
+            self.app: Application = Application(backend="uia").connect(
                 title_re=".*Jardic Pro.*", timeout=10
             )
 
-        self.win = self.app.window(title_re=".*Jardic.*")
+        self.win: WindowSpecification = self.app.window(title_re=".*Jardic.*")
         self.win.wait("ready", timeout=10)
 
     def switch_tab(self, tab_index: int):
@@ -63,13 +63,13 @@ class WordParserGUI:
             self.switch_tab(tab_idx)
 
             input_box.type_keys(word, with_spaces=True)
-            pane = self.win.child_window(control_id=201)
-            table = self.win.child_window(control_id=100)
+            pane: WindowSpecification = self.win.child_window(control_id=201)
+            table: WindowSpecification = self.win.child_window(control_id=100)
             table_obj: ListViewWrapper = table.wrapper_object()
 
             last_article = ""
             while True:
-                current_article = pane.get_value().replace("\r", "\n").strip()
+                current_article: str = pane.get_value().replace("\r", "\n").strip()
 
                 is_article_correct = self.is_article_correct(
                     current_article, word, kata
@@ -87,7 +87,7 @@ class WordParserGUI:
 
             last_article = ""
             while True:
-                current_article = pane.get_value().replace("\r", "\n").strip()
+                current_article: str = pane.get_value().replace("\r", "\n").strip()
                 is_article_correct = self.is_article_correct(
                     current_article, word, kata
                 )
@@ -110,7 +110,7 @@ class WordParserGUI:
         for entry in results:
             entry = entry.replace("\r", "")
             sents = entry.split("\n")
-            strip = 1
+            strip: int = 1
 
             yarxi_reading = self.YARXI_RE.findall(sents[1])
 
