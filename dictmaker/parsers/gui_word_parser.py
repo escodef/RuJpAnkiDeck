@@ -1,10 +1,15 @@
+from pywinauto.controls.uiawrapper import UIAWrapper
 import logging
 import re
 import jaconv
 
 from typing import List
 from pywinauto import Application, WindowSpecification
-from pywinauto.controls.uia_controls import ListViewWrapper
+from pywinauto.controls.uia_controls import (
+    ListViewWrapper,
+    TabControlWrapper,
+    EditWrapper,
+)
 from pywinauto.findwindows import ElementNotFoundError
 from models.models import Translation
 from parsers.example_parser import ExampleParser
@@ -39,8 +44,9 @@ class WordParserGUI:
         self.win.wait("ready", timeout=10)
 
     def switch_tab(self, tab_index: int):
-        tab_ctrl = self.win.child_window(control_type="Tab")
-        tab_items = tab_ctrl.children(control_type="TabItem")
+        tab_ctrl_spec: WindowSpecification = self.win.child_window(control_type="Tab")
+        tab_ctrl: TabControlWrapper = tab_ctrl_spec.wrapper_object()
+        tab_items: List[UIAWrapper] = tab_ctrl.children(control_type="TabItem")
 
         self.logger.debug(f"Tab items: {tab_items}")
 
@@ -56,18 +62,24 @@ class WordParserGUI:
         kata = wordcsv[2]
 
         try:
-            input_box = self.win.child_window(auto_id="202", control_type="Edit")
+            input_box_spec: WindowSpecification = self.win.child_window(
+                auto_id="202", control_type="Edit"
+            )
+            input_box: EditWrapper = input_box_spec.wrapper_object()
             input_box.set_edit_text("")
 
-            tab_idx = 2 if has_kanji(word) else 1
+            tab_idx: int = 2 if has_kanji(word) else 1
             self.switch_tab(tab_idx)
 
             input_box.type_keys(word, with_spaces=True)
-            pane: WindowSpecification = self.win.child_window(control_id=201)
+
+            pane_spec: WindowSpecification = self.win.child_window(control_id=201)
+            pane: EditWrapper = pane_spec.wrapper_object()
+
             table: WindowSpecification = self.win.child_window(control_id=100)
             table_obj: ListViewWrapper = table.wrapper_object()
 
-            last_article = ""
+            last_article: str = ""
             while True:
                 current_article: str = pane.get_value().replace("\r", "\n").strip()
 
@@ -85,7 +97,6 @@ class WordParserGUI:
 
             results: list[str] = []
 
-            last_article = ""
             while True:
                 current_article: str = pane.get_value().replace("\r", "\n").strip()
                 is_article_correct = self.is_article_correct(
@@ -96,7 +107,6 @@ class WordParserGUI:
                     break
 
                 results.append(current_article)
-                last_article = current_article
                 table_obj.type_keys("{VK_DOWN}")
 
             return self.process_results(results)

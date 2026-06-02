@@ -36,6 +36,12 @@ wheels = [
 name = "ankimaker"
 version = "0.1.0"
 source = { virtual = "ankimaker" }
+dependencies = [
+    { name = "shared" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "shared", editable = "shared" }]
 
 [[package]]
 name = "annotated-types"
