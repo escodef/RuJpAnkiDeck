@@ -292,7 +292,7 @@ def test_colon_kaikan(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "開罐･開缶"
     assert first_res.reading == "かいかん"
-    assert first_res.mainsense == "открывать банку (напр. консервов)"
+    assert first_res.mainsense == "открывать банку"
 
 
 def test_colon_shoukei(parser):
@@ -374,7 +374,7 @@ def test_kata_only(parser):
     assert isinstance(first_res, Translation)
     assert first_res.word == "チョコレート"
     assert first_res.reading == "チョコレート"
-    assert first_res.mainsense == "шоколад (англ. chocolate)"
+    assert first_res.mainsense == "шоколад"
 
 
 def test_article_with_brackets(parser):
@@ -475,7 +475,7 @@ def test_loanword_mangan(parser):
 
     assert result.word == "マンガン"
     assert result.reading == "マンガン"
-    assert result.mainsense == "(нем. Mangan) хим. марганец"
+    assert result.mainsense == "хим. марганец"
     assert (
         result.senses
         == """уст. 満俺
@@ -618,7 +618,7 @@ def test_loanword_centimetre(parser):
 
     assert result.word == "センチメートル"
     assert result.reading == "センチメートル"
-    assert result.mainsense == "(англ. centimetre) сантиметр"
+    assert result.mainsense == "сантиметр"
 
 
 def test_recursive_yuke(parser):
@@ -649,7 +649,7 @@ def test_really_bad_article(parser):
 
     assert result.word == "カルタ"
     assert result.reading == "カルタ"
-    assert result.mainsense == "(португ. carta) [игральные] карты"
+    assert result.mainsense == "[игральные] карты"
 
 
 def test_really_bad_article_hitoshii(parser):
@@ -781,7 +781,7 @@ TN36589"""
 
     assert result.word == "スピードアップ"
     assert result.reading == "すぴーどあっぷ"
-    assert result.mainsense == "повышение скорости (англ. speedup)"
+    assert result.mainsense == "повышение скорости"
 
 
 def test_yarxi_double_reading(parser):
@@ -836,3 +836,62 @@ def test_article_with_brackets_chimata(parser):
     assert result.word == "巷"
     assert result.reading == "ちまた"
     assert result.mainsense == "перекрёсток, улица"
+
+
+def test_really_bad_yarxi_article_mae(parser):
+    test_articles = [
+        """前　　　 перед
+антоним 後
+ZEN  qián
+前 [mae] 1) перёд; ~ni впереди; ~no передний; 2) в чьём-л. присутствии, перед кем-л.; 3) ~ni раньше; ~no прежний, прошлый; 4) ~ni заранее; 5) редк., гениталии
+お前まえ [o-mae] грубо ты
+前々 [maemae] ~kara уже давно, задолго до чего-л.
+  В сочетаниях: 
+1) передний; впереди; перед чем-л. ("zen", "mae") 
+前部 [zenbu] передняя часть, перёд
+前輪 [zenrin] редк. [maewa] переднее колесо
+前足 [maeashi] передняя нога (лапа); ср. 前脚, 前肢
+駅前 [ekimae] привокзальная площадь
+目前 [mokuzen] (-no) ~de (~ni) на глазах (перед глазами, под носом) у кого-л.; ср. 目の前 [me-no mae]
+2) раньше чего-л. ("zen", "mae") 
+以前 [izen] 1) тому назад; до; 2) ~[ni] раньше, прежде; ~no прежний, давнишний; ~kara издавна
+午前 [gozen] до полудня, утром
+食前 [shokuzen] до еды, перед едой
+夜明け前 [yoakemae] перед рассветом
+二年前 [ninenmae] два года назад
+3) заранее ("zen", "mae") 
+前以て [maemotte] заранее, предварительно
+前払い [maebarai] предварительная оплата
+前金 [maekin] [zenkin] предоплата, аванс
+前文 [zenbun] 1) преамбула; 2) предыдущая фраза, вышесказанное
+4) предшествующий ("zen") 
+前回 [zenkai] прошлый раз; ~no прошлый, предыдущий, последний
+前々回 [zenzenkai] позапрошлый (предпоследний) раз; ~no предпоследний
+前記 [zenki] ~no вышеупомянутый, вышеуказанный
+前条 [zenjo:] предыдущая статья (параграф, пункт)
+5) порция; доля ("-mae") 
+二人前 [ninin-mae] [futari-mae] ~no на двоих (порция)
+6) суффикс после имён придворных дам ("-mae") 
+玉藻の前 [tamamo-no-mae] госпожа Тамамо
+7) идиоматические сочетания ("-mae") 
+名前 [namae] имя
+手前 [temae] 1) эта сторона; (-no) ~ni перед чем-л.; 2) скромно я; ~no мой; 3) грубо ты; 4) (-no) ради чего-л.; из уважения к кому-л.; принимая во внимание что-л.; 5) условия жизни, жизнь; 6) см. お手前
+男前 [otokomae] красивая наружность (мужчины); ~da быть красивым
+腕前 [udemae] умение, способности
+気前 [kimae] великодушие, щедрость; см. 気前のいい
+建前 [tatemae] 1) [декларируемые, внешние, показные] принципы; иначе 立前антоним 本音 [honne]; 2) [торжественная] закладка нового здания
+当たり前 [atarimae] 1) ~[da] естественно, ничего удивительного, само собой разумеется; ~no естественный, неудивительный; правильный; заслуженный; 2) ~no обычный, обыкновенный, нормальный; ~ni как обычно, как всегда
+
+Ключ: 刀 (刂,⺈) (18), 八 (ハ) (12). Штрихов: 9. Исп.: Гакусю (2)
+Частотность: 27, JLPT: 4
+Nelson: 595; New Nelson: 490; S&H: 2o7.3; Halpern: 2266; Gakken: 38; Heisig: 290; Henshall: 159
+KN1614
+
+"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "前"
+    assert result.reading == "まえ"
+    assert result.mainsense == "перед, передний, впереди"

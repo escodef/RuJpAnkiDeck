@@ -11,4 +11,8 @@ def has_kanji(text: str) -> bool:
 
 
 def split_by_dots(text: str) -> list[str]:
-    return re.split(r"・|･", text)
+    return re.split(r"・|･|, |,", text)
+
+
+def get_yarxi_readings(text: str) -> list[str]:
+    return re.findall(r"\[([^\]]+)\]", text)

@@ -13,12 +13,17 @@ from pywinauto.controls.uia_controls import (
 from pywinauto.findwindows import ElementNotFoundError
 from models.models import Translation
 from parsers.example_parser import ExampleParser
-from shared.regex.utils import has_cyrillic, has_kanji, split_by_dots
+from shared.regex.utils import (
+    has_cyrillic,
+    has_kanji,
+    split_by_dots,
+    get_yarxi_readings,
+)
 
 
 class WordParserGUI:
     JAP_LETTERS = r"\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF"
-    YARXI_RE = re.compile(r"^\[([a-zA-Z-:]+)\]")
+    YARXI_RE = re.compile(r"\[([a-z-:]+)\]")
     JAP_RE = re.compile(rf"^[^\s\w]*[\[\]\/{JAP_LETTERS}\s,]+", re.UNICODE)
     LIST_RE = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
     LETTER_LIST_RE = re.compile(r"^[а-яёA-Za-z]\)\s?")
@@ -36,7 +41,7 @@ class WordParserGUI:
         except ElementNotFoundError, Exception:
             self.logger.debug("App not found. Starting up...")
             Application(backend="uia").start(jardic_path)
-            self.app: Application = Application(backend="uia").connect(
+            self.app = Application(backend="uia").connect(
                 title_re=".*Jardic Pro.*", timeout=10
             )
 
@@ -122,7 +127,7 @@ class WordParserGUI:
             sents = entry.split("\n")
             strip: int = 1
 
-            yarxi_reading = self.YARXI_RE.findall(sents[1])
+            yarxi_reading = self.YARXI_RE.findall(" ".join(sents[1:4]))
 
             self.logger.debug(yarxi_reading)
 
@@ -204,6 +209,8 @@ class WordParserGUI:
             result = result + ", " + part
             i = i + 1
 
+        result = re.sub(r"\s*\([а-яёА-ЯЁ]+\.\s*.+?\)\s*", "", result).strip()
+
         return (
             result
             if result.count("(") == result.count(")")
@@ -212,13 +219,15 @@ class WordParserGUI:
 
     def is_article_correct(self, article_text: str, word: str, kata: str) -> bool:
         lines = article_text.splitlines()
+        self.logger.debug(" ".join(lines[1:5]))
         if not lines:
             return False
 
-        if self.YARXI_RE.match(lines[1]):
-            kana_line = jaconv.alphabet2kana(lines[1].replace("[", "").replace("]", ""))
+        if self.YARXI_RE.search(" ".join(lines[1:5])):
+            self.logger.debug("распознана yarxi статья")
+            romaji_readings = get_yarxi_readings(lines[1])
             kanji_line = lines[0].split()[0] if has_kanji(lines[0]) else ""
-            kana_variants = [kana_line]
+            kana_variants = [jaconv.alphabet2kana(r) for r in romaji_readings]
             kanji_variants = [kanji_line.strip()]
         else:
             kana_line = lines[0]

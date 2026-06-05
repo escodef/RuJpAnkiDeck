@@ -23,7 +23,7 @@ uv run --package dictmaker python dictmaker/main.py
 
 Тесты можно запустить аналогично:
 ```sh
-uv run --package dictmaker pytest dictmaker/tests/
+uv run --package dictmaker pytest -o log_cli=true --log-cli-level=DEBUG dictmaker/tests/
 ```
 
 Для работы на Windows требует установленной программы-словаря Jardic. Так же рекомендуется скачать дополнительные словари
