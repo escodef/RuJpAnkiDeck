@@ -1,17 +1,18 @@
 import pytest
 import logging
-from parsers.gui_word_parser import WordParserGUI
+from parsers.article_parser import ArticleParser
 
 
 @pytest.fixture
 def parser():
-    obj = WordParserGUI.__new__(WordParserGUI)
-    obj.logger = logging
+    obj = ArticleParser()
+
+    obj.logger = logging.getLogger(__name__)
 
     return obj
 
 
-def test_basic_article_ra(parser):
+def test_basic_article_ra(parser: ArticleParser):
     test_article = """…ら
 …等
 суф. мн. числа; после имени собств. и другие; и его друзья (сторонники); и иже с ним, и его присные; и сопровождающие его лица.
@@ -22,7 +23,7 @@ def test_basic_article_ra(parser):
     assert result is True
 
 
-def test_basic_article_check(parser):
+def test_basic_article_check(parser: ArticleParser):
     test_article = """チェックする
 1. проверять (англ. to check)
 2. отмечать, помечать
@@ -33,7 +34,7 @@ def test_basic_article_check(parser):
     assert result is True
 
 
-def test_basic_article_kouchiku(parser):
+def test_basic_article_kouchiku(parser: ArticleParser):
     test_article = """こうちく　　
 構築
 сооружение, постройка, строительство;
@@ -44,7 +45,7 @@ def test_basic_article_kouchiku(parser):
     assert result is True
 
 
-def test_basic_article_han(parser):
+def test_basic_article_han(parser: ArticleParser):
     test_article = """たん　　　　
 反･段
 1) тан (мера длины для тканей = 10,6 м);
@@ -55,7 +56,7 @@ def test_basic_article_han(parser):
     assert result is True
 
 
-def test_yarxi_simple_article(parser):
+def test_yarxi_simple_article(parser: ArticleParser):
     test_article = """東口
 [higashiguchi]
 восточный вход (выход)
@@ -67,7 +68,7 @@ TN57062"""
     assert result is True
 
 
-def test_yarxi_simple_article_mosu(parser):
+def test_yarxi_simple_article_mosu(parser: ArticleParser):
     test_article = """燃す
 [mosu]
 см. 燃やす [moyasu]
@@ -79,7 +80,7 @@ TN69217"""
     assert result is True
 
 
-def test_yarxi_complex_article_mae(parser):
+def test_yarxi_complex_article_mae(parser: ArticleParser):
     test_article = """前　　　 перед
 антоним 後
 ZEN  qián
@@ -134,7 +135,7 @@ KN1614
     assert result is True
 
 
-def test_warodai_simple_article_soshite(parser):
+def test_warodai_simple_article_soshite(parser: ArticleParser):
     test_article = """そして, そうして　
 союз и, тогда."""
 
@@ -143,7 +144,7 @@ def test_warodai_simple_article_soshite(parser):
     assert result is True
 
 
-def test_yarxi_simple_article_soshite(parser):
+def test_yarxi_simple_article_soshite(parser: ArticleParser):
     test_article = """そして
 [soshite], редк. [so:shite]
 союз и, [и] тогда, далее; реже 然して

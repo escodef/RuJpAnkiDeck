@@ -10,7 +10,7 @@ def processor():
     return obj
 
 
-def test_iu(processor):
+def test_iu(processor: DictionaryProcessor):
     dictionary = []
     test_translations = [
         Translation(
@@ -47,7 +47,7 @@ def test_iu(processor):
     assert len(dictionary) == 2
 
 
-def test_kore(processor):
+def test_kore(processor: DictionaryProcessor):
     dictionary = []
     test_translations = [
         Translation(
@@ -149,7 +149,7 @@ def test_kore(processor):
     assert len(dictionary) == 2
 
 
-def test_go(processor):
+def test_go(processor: DictionaryProcessor):
     dictionary = []
     test_translations = [
         Translation(

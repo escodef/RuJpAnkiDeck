@@ -1,9 +1,14 @@
+import sys
 import signal
 import logging
+
+from shared.config import JARDIC_PATH, DICT_URL
 from shared.database.db_session import init_db, SessionLocal
 from shared.database.utils import save_to_sqlite
-from shared.csv.utils import get_words
+from shared.csv import get_words
 from core.processor import DictionaryProcessor
+from parsers.gui_word_parser import WordParserGUI
+from parsers.word_parser import WordParser
 
 
 logging.basicConfig(
@@ -18,8 +23,18 @@ logging.basicConfig(
 
 def main():
     init_db()
+
     session = SessionLocal()
-    processor = DictionaryProcessor()
+
+    is_windows = sys.platform == "win32"
+    if is_windows:
+        logging.info("Using GUI Parser (Windows)")
+        parser = WordParserGUI(JARDIC_PATH)
+    else:
+        logging.info("Using Web Parser (Non-Windows)")
+        parser = WordParser(DICT_URL)
+
+    processor = DictionaryProcessor(parser=parser, session=session)
 
     def signal_handler(signum, frame):
         logging.info("Gracefully shutting down...")
@@ -27,12 +42,18 @@ def main():
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+
     try:
         words_to_parse = get_words()
         processor.parse_words(words_to_parse[:25000])
-        save_to_sqlite(processor.dictionary)
 
-        logging.info("Parse done")
+        if processor.dictionary:
+            save_to_sqlite(processor.dictionary, session=session)
+            session.commit()
+
+        logging.info("Parse completed successfully.")
+    except Exception as e:
+        logging.error(f"Fatal error: {e}")
     finally:
         session.close()
         logging.info("Session closed.")

@@ -1,4 +1,3 @@
-import sys
 import os
 import logging
 import traceback
@@ -13,11 +12,11 @@ from shared.database.utils import (
     get_not_found,
     get_all_parsed_indexes,
 )
-from shared.regex.utils import has_kanji, split_by_dots
+from shared.regex import has_kanji, split_by_dots
 from typing import List
 from models.models import DictionaryList
-from parsers.word_parser import WordParser
-from parsers.gui_word_parser import WordParserGUI
+from parsers.base import BaseWordParser
+from sqlalchemy.orm import Session
 
 load_dotenv()
 
@@ -26,16 +25,12 @@ jardic_path = os.getenv("JARDIC_PATH", "C:\Program Files (x86)\JardicPro\JardicP
 
 
 class DictionaryProcessor:
-    def __init__(self):
-        self.is_windows = sys.platform == "win32"
-        if dict_url and jardic_path:
-            self.parser = (
-                WordParserGUI(jardic_path) if self.is_windows else WordParser(dict_url)
-            )
+    def __init__(self, parser: BaseWordParser, session: Session):
+        self.parser = parser
+        self.session = session
         self.running = True
 
-        self.parsed_indexes = get_all_parsed_indexes()
-
+        self.parsed_indexes = get_all_parsed_indexes(self.session)
         self.dictionary: DictionaryList = list()
 
     def stop(self):
@@ -70,12 +65,12 @@ class DictionaryProcessor:
             return True
         reading = jaconv.kata2hira(reading_kata)
         if has_kanji(word):
-            exists = get_by_word_and_reading(word, reading)
+            exists = get_by_word_and_reading(word, reading, self.session)
         else:
-            exists = get_by_reading(reading)
+            exists = get_by_reading(reading, session=self.session)
 
         if not exists:
-            exists = get_not_found(word, reading_kata)
+            exists = get_not_found(word, reading_kata, self.session)
 
         return bool(exists)
 
@@ -84,7 +79,7 @@ class DictionaryProcessor:
         seen_in_batch = set()
         for index, wordcsv in enumerate(words):
             if not self.running:
-                save_to_sqlite(self.dictionary)
+                save_to_sqlite(self.dictionary, self.session)
                 break
             word, _, reading_raw = wordcsv[:3]
             try:
@@ -92,7 +87,7 @@ class DictionaryProcessor:
                     continue
                 logging.info(f"Parsing word: {word} at index {index}")
 
-                translations = self.parser.parse_word(wordcsv)
+                translations = self.parser.parse_article(wordcsv)
 
                 if translations is None:
                     continue
@@ -111,10 +106,11 @@ class DictionaryProcessor:
                     logging.warning(
                         f"translations len: {len(translations)} for word {word} at index {index}"
                     )
-                    add_not_found(word, reading_raw)
+                    add_not_found(word, reading_raw, self.session)
 
                 if len(self.dictionary) >= batch_size:
-                    save_to_sqlite(self.dictionary)
+                    save_to_sqlite(self.dictionary, self.session)
+                    self.session.commit()
                     self.dictionary.clear()
                     seen_in_batch.clear()
                     logging.info("Batch saved to database.")

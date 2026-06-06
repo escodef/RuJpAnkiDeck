@@ -1,18 +1,21 @@
 import logging
-import re
 import html2text
 import requests
 
+from parsers.base import BaseWordParser
 from models.models import Translation
 from bs4 import BeautifulSoup, Tag, NavigableString
-from typing import List
+from parsers.article_parser import ArticleParser
+from typing import List, override
 from parsers.example_parser import ExampleParser
 
 
-class WordParser:
+class WordParser(BaseWordParser):
     def __init__(self, jardic_url: str):
         super().__init__()
         self.logger = logging.getLogger(__name__)
+
+        self.text_parser = ArticleParser()
 
         self.session = requests.Session()
         self.session.headers.update(
@@ -31,12 +34,13 @@ class WordParser:
 
         self.jardic_url = jardic_url
 
-    def parse_word(self, wordlist: List[str]) -> Translation | None:
-        word = wordlist[0]
-        katakana_reading = wordlist[2]
+    @override
+    def parse_article(self, wordcsv: List[str]) -> List[Translation] | None:
+        word = wordcsv[0]
+        katakana_reading = wordcsv[2]
 
         try:
-            url = f"{self.jardic_url}?q={word}&pg=0&sw=1472&dic_yarxi=1"
+            url = f"{self.jardic_url}?q={word}&pg=0&dic_jardic=1&dic_warodai=1&dic_yarxi=1&sw=1536"
 
             response = self.session.get(url)
             response.raise_for_status()
@@ -53,74 +57,38 @@ class WordParser:
                 self.logger.debug(f"No rows in tab for word: {word}")
                 return None
 
-            self.logger.debug(len(rows))
+            self.logger.debug(f"Found {len(rows)} rows inside tabContent for: {word}")
+
+            translations_accumulated: List[Translation] = []
 
             for row in rows:
                 td = row.find("td") or row.select_one('td[id^="word-"]')
 
                 if not td:
-                    self.logger.debug(f"No matching td in row for word: {word}")
                     continue
 
                 text = self.h2t.handle(str(td))
 
                 if not text:
-                    self.logger.debug(f"No text extracted for word: {word}")
                     continue
 
-                lines = text.splitlines()
+                lines = [line.strip() for line in text.splitlines()]
+                cleaned_text = "\n".join(lines).strip()
 
-                lines = [line.strip() for line in lines]
+                if self.text_parser.is_article_correct(
+                    cleaned_text, word, katakana_reading
+                ):
+                    self.logger.debug(f"Matched correct article for: {word}")
 
-                text = "\n".join(lines)
-
-                if re.search(self.short_article_template, text, re.MULTILINE):
-                    self.logger.debug(text)
-                    self.logger.debug("this is a short article")
-
-                    senses = re.sub(r"^.*\n\[.*\]\n", "", text, flags=re.DOTALL)
-
-                    mainsense_match = re.search(r"[ЁёА-я].*?;", text)
-                    mainsense = (
-                        mainsense_match.group().rstrip(";")
-                        if mainsense_match
-                        else senses
-                    )
-
-                    self.logger.debug(senses)
-
-                    t = Translation(
-                        word=word,
-                        reading=katakana_reading,
-                        mainsense=mainsense,
-                        senses=senses.strip(),
-                    )
+                    parsed_ts = self.text_parser.process_results([cleaned_text])
+                    if parsed_ts:
+                        translations_accumulated.extend(parsed_ts)
                 else:
-                    self.logger.debug("this is a long article")
-                    sep = "\nВ сочетаниях"
-                    text, _, _ = text.partition(sep)
-                    self.logger.debug(text)
-
-                    pattern = re.compile(rf"^{re.escape(word)}.*$", re.MULTILINE)
-
-                    matches: List[str] = pattern.findall(text)
-                    mainsense = matches[0].replace(word, "").strip()
-
-                    self.logger.debug("matches found")
-                    self.logger.debug(matches)
-
-                    senses = "\n".join(matches[1:])
-
-                    t = Translation(
-                        word=word,
-                        reading=katakana_reading,
-                        mainsense=mainsense,
-                        senses=senses,
+                    self.logger.debug(
+                        f"Skipping article (incorrect match) for: {word} with reading: {katakana_reading}"
                     )
 
-                    # t.examples = self.example_parser.parse_word(word)
-
-                return t
+            return translations_accumulated if translations_accumulated else None
 
         except Exception as e:
             self.logger.error(f"Error parsing word {word}: {e}")
@@ -140,6 +108,5 @@ class WordParser:
                     result.append("\n")
 
         text = " ".join(result)
-
         text = text.replace("\n\n", "\n").strip()
         return text

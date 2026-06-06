@@ -1,20 +1,20 @@
 import pytest
 import logging
 
-from parsers.gui_word_parser import WordParserGUI
+from parsers.article_parser import ArticleParser
 from models.models import Translation
 
 
 @pytest.fixture
 def parser():
-    obj = WordParserGUI.__new__(WordParserGUI)
+    obj = ArticleParser()
 
     obj.logger = logging.getLogger(__name__)
 
     return obj
 
 
-def test_basic_article_ra(parser):
+def test_basic_article_ra(parser: ArticleParser):
     test_articles_ra = [
         """…ら
 …等
@@ -31,7 +31,7 @@ def test_basic_article_ra(parser):
     assert first_res.mainsense == "суф. мн. числа"
 
 
-def test_basic_article_hani(parser):
+def test_basic_article_hani(parser: ArticleParser):
     test_articles_hani = [
         """はんい
 範囲
@@ -52,7 +52,7 @@ def test_basic_article_hani(parser):
     assert first_res.mainsense == "сфера, область, круг"
 
 
-def test_basic_article_no(parser):
+def test_basic_article_no(parser: ArticleParser):
     test_articles = [
         """の
 野
@@ -68,7 +68,7 @@ def test_basic_article_no(parser):
     assert first_res.mainsense == "поле, равнина, луг, степь"
 
 
-def test_basic_article_shindan(parser):
+def test_basic_article_shindan(parser: ArticleParser):
     test_articles = [
         """しんだん
 診断
@@ -86,7 +86,7 @@ def test_basic_article_shindan(parser):
     assert first_res.mainsense == "диагноз, ставить диагноз"
 
 
-def test_basic_article_iu(parser):
+def test_basic_article_iu(parser: ArticleParser):
     test_articles = [
         """いう
 言う
@@ -104,7 +104,7 @@ def test_basic_article_iu(parser):
     assert first_res.mainsense == "говорить, сказать, заметить"
 
 
-def test_list_article_beshi(parser):
+def test_list_article_beshi(parser: ArticleParser):
     test_articles = [
         """べし
 可し
@@ -121,7 +121,7 @@ def test_list_article_beshi(parser):
     assert first_res.mainsense == "нужно, следует (делать и т.п.)"
 
 
-def test_list_article_tokoro(parser):
+def test_list_article_tokoro(parser: ArticleParser):
     test_articles = [
         """ところ
 所I･処
@@ -169,7 +169,7 @@ def test_list_article_tokoro(parser):
     assert first_res.mainsense == "место, находиться где-л"
 
 
-def test_list_article_dzukuri(parser):
+def test_list_article_dzukuri(parser: ArticleParser):
     test_articles = [
         """…づくり
 …造り
@@ -191,7 +191,7 @@ def test_list_article_dzukuri(parser):
     )
 
 
-def test_list_article_mame(parser):
+def test_list_article_mame(parser: ArticleParser):
     test_articles = [
         """まめ　　　　
 まめ･忠実
@@ -221,7 +221,7 @@ def test_list_article_mame(parser):
     )
 
 
-def test_list_article_jun(parser):
+def test_list_article_jun(parser: ArticleParser):
     test_articles = [
         """じゅん　　　
 純
@@ -238,7 +238,7 @@ def test_list_article_jun(parser):
     assert first_res.mainsense == "чистый, незапятнанный"
 
 
-def test_date_chouwa(parser):
+def test_date_chouwa(parser: ArticleParser):
     test_articles = [
         """ちょうわ　　
 長和
@@ -255,7 +255,7 @@ def test_date_chouwa(parser):
     assert first_res.senses == "1012.XII — 1017.IV"
 
 
-def test_recursive_articles(parser):
+def test_recursive_articles(parser: ArticleParser):
     test_articles = [
         """つく　　　　
 木菟･木兎
@@ -279,7 +279,7 @@ def test_recursive_articles(parser):
     assert len(results) == 0
 
 
-def test_colon_kaikan(parser):
+def test_colon_kaikan(parser: ArticleParser):
     test_articles = [
         """かいかん　　
 開罐･開缶
@@ -295,7 +295,7 @@ def test_colon_kaikan(parser):
     assert first_res.mainsense == "открывать банку"
 
 
-def test_colon_shoukei(parser):
+def test_colon_shoukei(parser: ArticleParser):
     test_articles = [
         """しょうけい　
 小慧
@@ -311,7 +311,7 @@ def test_colon_shoukei(parser):
     assert first_res.mainsense == "кн. толковый, смышлёный"
 
 
-def test_with_footnote_boudai(parser):
+def test_with_footnote_boudai(parser: ArticleParser):
     test_articles = [
         """ぼうだい　　
 厖大
@@ -329,7 +329,7 @@ def test_with_footnote_boudai(parser):
     assert first_res.mainsense == "огромный, громадный"
 
 
-def test_nonstandard_kakaru(parser):
+def test_nonstandard_kakaru(parser: ArticleParser):
     test_articles = [
         """かかる
 как 2-ой компонент сложн. гл. указывает на начало и незаконченность действия:
@@ -345,7 +345,7 @@ def test_nonstandard_kakaru(parser):
     assert first_res.mainsense == "начинается..., вот-вот..., почти..., чуть не"
 
 
-def test_recursive_good(parser):
+def test_recursive_good(parser: ArticleParser):
     test_articles = [
         """ひざし　　　
 日差し･日射し
@@ -362,7 +362,7 @@ def test_recursive_good(parser):
     assert first_res.mainsense == "солнечный свет, лучи солнца"
 
 
-def test_kata_only(parser):
+def test_kata_only(parser: ArticleParser):
     test_articles = [
         """チョコレート
 шоколад (англ. chocolate)"""
@@ -377,7 +377,7 @@ def test_kata_only(parser):
     assert first_res.mainsense == "шоколад"
 
 
-def test_article_with_brackets(parser):
+def test_article_with_brackets(parser: ArticleParser):
     test_articles = [
         """ごう
 号
@@ -397,7 +397,7 @@ def test_article_with_brackets(parser):
     assert first_res.mainsense == "номер порядковый"
 
 
-def test_article_one_kanji_diff_reading(parser):
+def test_article_one_kanji_diff_reading(parser: ArticleParser):
     test_articles = [
         """たん, たんぶ　
 反･段, 反歩･段歩
@@ -424,7 +424,7 @@ def test_article_one_kanji_diff_reading(parser):
     assert result2.mainsense == "анти…, контр…, против[о]…"
 
 
-def test_yarxi_simple_article(parser):
+def test_yarxi_simple_article(parser: ArticleParser):
     test_articles = [
         """東口
 [higashiguchi]
@@ -441,7 +441,7 @@ TN57062"""
     assert result.senses == "восточный вход (выход)"
 
 
-def test_godan_second_form_hottarakashi(parser):
+def test_godan_second_form_hottarakashi(parser: ArticleParser):
     test_articles = [
         """ほったらかし
 2-я основа от:
@@ -464,7 +464,7 @@ def test_godan_second_form_hottarakashi(parser):
     )
 
 
-def test_loanword_mangan(parser):
+def test_loanword_mangan(parser: ArticleParser):
     test_articles = [
         """マンガン　　
 уст. 満俺
@@ -483,7 +483,7 @@ def test_loanword_mangan(parser):
     )
 
 
-def test_loanword_furan(parser):
+def test_loanword_furan(parser: ArticleParser):
     test_articles = [
         """フラン　　　
 уст. 法
@@ -502,7 +502,7 @@ def test_loanword_furan(parser):
     )
 
 
-def test_onomatopoeia_article_potsuri(parser):
+def test_onomatopoeia_article_potsuri(parser: ArticleParser):
     test_articles = [
         """ぽつり　　　
 ономат.:
@@ -517,7 +517,7 @@ def test_onomatopoeia_article_potsuri(parser):
     assert result.mainsense == "на меня капнул дождь"
 
 
-def test_onomatopoeia_article_gorogoro(parser):
+def test_onomatopoeia_article_gorogoro(parser: ArticleParser):
     test_articles = [
         """ごろごろ　　
 ономат.
@@ -538,7 +538,7 @@ def test_onomatopoeia_article_gorogoro(parser):
     assert result.mainsense == "грохот, грохотанье, тарахтенье"
 
 
-def test_nonstandart_article(parser):
+def test_nonstandart_article(parser: ArticleParser):
     test_articles = [
         """こころまち　
 心待ち
@@ -555,7 +555,7 @@ def test_nonstandart_article(parser):
     )
 
 
-def test_bad_newline_article(parser):
+def test_bad_newline_article(parser: ArticleParser):
     test_articles = [
         """てうち　　　
 手打ち
@@ -576,7 +576,7 @@ def test_bad_newline_article(parser):
     assert result.mainsense == "убить самолично (своей собственной рукой)"
 
 
-def test_letter_list_article_nanori(parser):
+def test_letter_list_article_nanori(parser: ArticleParser):
     test_articles = [
         """なのり　　　
 名乗り
@@ -591,7 +591,7 @@ def test_letter_list_article_nanori(parser):
     assert result.mainsense == "называть себя, представляться"
 
 
-def test_letter_list_article_tsuki(parser):
+def test_letter_list_article_tsuki(parser: ArticleParser):
     test_articles = [
         """つき　　　　
 付きI
@@ -607,7 +607,7 @@ def test_letter_list_article_tsuki(parser):
     assert result.mainsense == "хорошо сидеть (об одежде)"
 
 
-def test_loanword_centimetre(parser):
+def test_loanword_centimetre(parser: ArticleParser):
     test_articles = [
         """センチメートル　
 уст. 珊
@@ -621,7 +621,7 @@ def test_loanword_centimetre(parser):
     assert result.mainsense == "сантиметр"
 
 
-def test_recursive_yuke(parser):
+def test_recursive_yuke(parser: ArticleParser):
     test_articles = [
         """ゆけ　　　　
 湯気
@@ -635,7 +635,7 @@ def test_recursive_yuke(parser):
     assert result.mainsense == "почувствовать себя плохо от слишком горячей ванны"
 
 
-def test_really_bad_article(parser):
+def test_really_bad_article(parser: ArticleParser):
     test_articles = [
         """カルタ　　　
 уст. 歌留多, 加留多, 骨牌
@@ -652,7 +652,7 @@ def test_really_bad_article(parser):
     assert result.mainsense == "[игральные] карты"
 
 
-def test_really_bad_article_hitoshii(parser):
+def test_really_bad_article_hitoshii(parser: ArticleParser):
     test_articles = [
         """ひとしい　　
 等しい･均しい･斉しい
@@ -671,7 +671,7 @@ def test_really_bad_article_hitoshii(parser):
     assert result.mainsense == "равный"
 
 
-def test_article_with_footnote_chiken(parser):
+def test_article_with_footnote_chiken(parser: ArticleParser):
     test_articles = [
         """ちけん　　　
 地検
@@ -685,7 +685,7 @@ def test_article_with_footnote_chiken(parser):
     assert result.mainsense == "районная прокуратура"
 
 
-def test_really_bad_article_banzen(parser):
+def test_really_bad_article_banzen(parser: ArticleParser):
     test_articles = [
         """ばんぜん　　
 万全
@@ -702,7 +702,7 @@ def test_really_bad_article_banzen(parser):
     assert result.mainsense == "для полной гарантии, для верности"
 
 
-def test_really_bad_article_sameru(parser):
+def test_really_bad_article_sameru(parser: ArticleParser):
     test_articles = [
         """さめる　　　
 覚める･醒める
@@ -721,7 +721,7 @@ def test_really_bad_article_sameru(parser):
     assert result.mainsense == "просыпаться, пробуждаться"
 
 
-def test_really_bad_article_ryokai(parser):
+def test_really_bad_article_ryokai(parser: ArticleParser):
     test_articles = [
         """りょうかい　
 了解･諒解I
@@ -740,7 +740,7 @@ def test_really_bad_article_ryokai(parser):
     assert result.mainsense == "понимание, понимать"
 
 
-def test_really_bad_article_eibun(parser):
+def test_really_bad_article_eibun(parser: ArticleParser):
     test_articles = [
         """えいぶん　　
 叡聞
@@ -754,7 +754,7 @@ def test_really_bad_article_eibun(parser):
     assert result.mainsense == "довести до сведения императора"
 
 
-def test_really_bad_article_koukaku(parser):
+def test_really_bad_article_koukaku(parser: ArticleParser):
     test_articles = [
         """こうかく　　
 口角
@@ -768,7 +768,7 @@ def test_really_bad_article_koukaku(parser):
     assert result.mainsense == "с пеной у рта, горячо, страстно (спорить и т. п.)"
 
 
-def test_yarxi_simple_article_speedup(parser):
+def test_yarxi_simple_article_speedup(parser: ArticleParser):
     test_articles = [
         """スピードアップ
 [supi:do-appu]
@@ -784,7 +784,7 @@ TN36589"""
     assert result.mainsense == "повышение скорости"
 
 
-def test_yarxi_double_reading(parser):
+def test_yarxi_double_reading(parser: ArticleParser):
     test_articles = [
         """墨色
 [sumiiro], [bokushoku]
@@ -798,7 +798,7 @@ def test_yarxi_double_reading(parser):
     assert result.mainsense == "цвет (оттенок) туши"
 
 
-def test_bad_article_sashikomu(parser):
+def test_bad_article_sashikomu(parser: ArticleParser):
     test_articles = [
         """さしこむ　　
 差し込む･差込む
@@ -816,7 +816,7 @@ def test_bad_article_sashikomu(parser):
     assert result.mainsense == "вкладывать, вставлять"
 
 
-def test_article_with_brackets_chimata(parser):
+def test_article_with_brackets_chimata(parser: ArticleParser):
     test_articles = [
         """ちまた
 巷
@@ -838,7 +838,7 @@ def test_article_with_brackets_chimata(parser):
     assert result.mainsense == "перекрёсток, улица"
 
 
-def test_really_bad_yarxi_article_mae(parser):
+def test_really_bad_yarxi_article_mae(parser: ArticleParser):
     test_articles = [
         """前　　　 перед
 антоним 後
@@ -895,3 +895,40 @@ KN1614
     assert result.word == "前"
     assert result.reading == "まえ"
     assert result.mainsense == "перед, передний, впереди"
+
+
+def test_really_bad_yarxi_article_kon(parser: ArticleParser):
+    test_articles = [
+        """今　　　 сейчас
+KON, KIN (редк.)   jīn
+今 [ima] сейчас, теперь; ~no нынешний, теперешний; ~ni скоро; рано или поздно; всё еще; ~ni mo вот-вот, в любой момент; ~kara отныне, впредь; ~made до сих пор; ~de mo и сейчас
+今や [imaya] теперь
+今めかしい [imamekashii] модный
+今めく [imameku] гнаться за модой
+今し [imashi] редк.; только что
+  В сочетаниях: 
+1) теперь; нынешний ("kon", "ima", реже "kin") 
+今回 [konkai] в этот раз, на этот раз
+今週 [konshu:] эта неделя; на этой неделе
+△ 今日 [kyo:] редк. [konnichi] сегодня; ~no сегодняшний; ср. 今日は
+今度 [kondo] 1) на (в) этот раз; ~no этот, нынешний; 2) в следующий раз; в другой раз; вскоре; ~no ближайший, предстоящий; 3) недавно; ~no недавний
+今直ぐ [imasugu] сейчас [же]
+只今 [tadaima] 1) теперь, сейчас; 2) только что; 3) сейчас, скоро; 4) "Вот и я! " (приветствие по возвращении домой) иначе 唯今
+今上(陛下) [kinjo:(heika)] кн. ныне царствующий император
+2) ещё [один], лишний ("ima-") 
+今一つ [imahitotsu] ~[no] ещё один, другой
+今一年 [ima-ichinen] ещё один год, лишний год
+
+Ключ: 人 (亻,𠆢) (9). Штрихов: 4. Исп.: Гакусю (2)
+Частотность: 49, JLPT: 4
+Nelson: 352; New Nelson: 112; S&H: 2a2.10; Halpern: 1968; Gakken: 146; Heisig: 1587; Henshall: 125
+KN0943
+
+"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "今"
+    assert result.reading == "いま"
+    assert result.mainsense == "сейчас"

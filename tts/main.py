@@ -1,3 +1,11 @@
+from pathlib import Path
+from shared.media import get_audio_filename
+from shared.config import (
+    TTS_OUTPUT_FOLDER,
+    ACCENTS_FILE,
+    TTS_BATCH_SIZE,
+    TTS_SPEAKER_ID,
+)
 import os
 import re
 import requests
@@ -9,21 +17,16 @@ from dotenv import load_dotenv
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 
-from shared.csv.utils import get_words
+from shared.csv import get_words
 
 load_dotenv()
 
 Logger = getLogger(__name__)
 
-OUTPUT_DIR = os.getenv("TTS_OUTPUT_FOLDER", "output")
-BATCH_SIZE = int(os.getenv("TTS_BATCH_SIZE", 8))
-SPEAKER_ID = int(os.getenv("TTS_SPEAKER_ID", 13))
-ACCENTS_FILE = os.getenv("TTS_ACCENTS_FILE", "../data/accents.txt")
-
 VOICEVOX_URL = "http://127.0.0.1:50021"
 
 
-def load_accents(filepath: str) -> dict:
+def load_accents(filepath: Path) -> dict[tuple[str, str], int]:
     accents = {}
     if not os.path.exists(filepath):
         Logger.warning(
@@ -63,8 +66,8 @@ def build_aquestalk_kana(katakana: str, accent: int) -> str:
 def main():
     basicConfig(level=INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
+    if not os.path.exists(TTS_OUTPUT_FOLDER):
+        os.makedirs(TTS_OUTPUT_FOLDER)
 
     accents_dict = load_accents(ACCENTS_FILE)
     words = get_words()[:25000]
@@ -73,17 +76,16 @@ def main():
     for w in words:
         kanji = w[0]
         katakana = w[2].strip()
-        safe_katakana = katakana.replace("/", "").replace(" ", "")
-        filename = f"{kanji}_{safe_katakana}.mp3"
+        filename = get_audio_filename(kanji, katakana)
 
-        if not os.path.exists(os.path.join(OUTPUT_DIR, filename)):
+        if not os.path.exists(os.path.join(TTS_OUTPUT_FOLDER, filename)):
             words_to_process.append((kanji, katakana, filename))
 
     Logger.info(f"Осталось озвучить слов: {len(words_to_process)}")
 
     with requests.Session() as session:
-        for i in range(0, len(words_to_process), BATCH_SIZE):
-            batch = words_to_process[i : i + BATCH_SIZE]
+        for i in range(0, len(words_to_process), TTS_BATCH_SIZE):
+            batch = words_to_process[i : i + TTS_BATCH_SIZE]
 
             aquestalk_phrases = []
 
@@ -98,7 +100,11 @@ def main():
             try:
                 res_phrases = session.post(
                     f"{VOICEVOX_URL}/accent_phrases",
-                    params={"text": batch_text, "is_kana": True, "speaker": SPEAKER_ID},
+                    params={
+                        "text": batch_text,
+                        "is_kana": True,
+                        "speaker": TTS_SPEAKER_ID,
+                    },
                     timeout=15,
                 )
                 res_phrases.raise_for_status()
@@ -106,7 +112,7 @@ def main():
 
                 query_res = session.post(
                     f"{VOICEVOX_URL}/audio_query",
-                    params={"text": "あ", "speaker": SPEAKER_ID},
+                    params={"text": "あ", "speaker": TTS_SPEAKER_ID},
                     timeout=15,
                 )
                 query_res.raise_for_status()
@@ -118,7 +124,7 @@ def main():
 
                 synth_res = session.post(
                     f"{VOICEVOX_URL}/synthesis",
-                    params={"speaker": SPEAKER_ID},
+                    params={"speaker": TTS_SPEAKER_ID},
                     json=query_data,
                     timeout=60,
                 )
@@ -138,10 +144,10 @@ def main():
                 if len(chunks) == len(batch):
                     for chunk, (kanji, katakana, filename) in zip(chunks, batch):
                         filename_mp3 = filename.rsplit(".", 1)[0] + ".mp3"
-                        fn = os.path.join(OUTPUT_DIR, filename_mp3)
+                        fn = os.path.join(TTS_OUTPUT_FOLDER, filename_mp3)
                         chunk.export(fn, format="mp3", bitrate="64k")
                     Logger.info(
-                        f"Батч {i // BATCH_SIZE + 1} успешно обработан ({len(batch)} слов)."
+                        f"Батч {i // TTS_BATCH_SIZE + 1} успешно обработан ({len(batch)} слов)."
                     )
                 else:
                     Logger.warning(
@@ -164,13 +170,13 @@ def fallback_single_generation(batch: list[tuple], session, accents_dict):
         try:
             res_phrases = session.post(
                 f"{VOICEVOX_URL}/accent_phrases",
-                params={"text": aq_str, "is_kana": True, "speaker": SPEAKER_ID},
+                params={"text": aq_str, "is_kana": True, "speaker": TTS_SPEAKER_ID},
             )
             res_phrases.raise_for_status()
 
             query_res = session.post(
                 f"{VOICEVOX_URL}/audio_query",
-                params={"text": "あ", "speaker": SPEAKER_ID},
+                params={"text": "あ", "speaker": TTS_SPEAKER_ID},
             )
             query_data = query_res.json()
             query_data["accent_phrases"] = res_phrases.json()
@@ -180,7 +186,7 @@ def fallback_single_generation(batch: list[tuple], session, accents_dict):
 
             synth_res = session.post(
                 f"{VOICEVOX_URL}/synthesis",
-                params={"speaker": SPEAKER_ID},
+                params={"speaker": TTS_SPEAKER_ID},
                 json=query_data,
                 timeout=30,
             )
@@ -188,7 +194,7 @@ def fallback_single_generation(batch: list[tuple], session, accents_dict):
             audio = AudioSegment.from_file(io.BytesIO(synth_res.content), format="wav")
             filename_mp3 = filename.rsplit(".", 1)[0] + ".mp3"
 
-            fn = os.path.join(OUTPUT_DIR, filename_mp3)
+            fn = os.path.join(TTS_OUTPUT_FOLDER, filename_mp3)
             audio.export(fn, format="mp3", bitrate="64k")
             Logger.info(f"Fallback: успешно обработано {filename}")
 

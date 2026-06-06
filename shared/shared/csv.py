@@ -1,9 +1,7 @@
-import os
+from shared.config import CSV_PATH
 import csv
 
 from typing import List
-
-CSV_PATH = os.getenv("CSV_FILE", "./data/freq_list.csv")
 
 EXCLUDED_POS = frozenset(["助動詞", "記号", "動詞-接尾", "助詞"])
 

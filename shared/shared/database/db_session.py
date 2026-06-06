@@ -1,14 +1,10 @@
 from typing import Iterator
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from dotenv import load_dotenv
 from contextlib import contextmanager
+from shared.config import DB_PATH
 
-load_dotenv()
-
-db_path = os.getenv("DB_PATH", "./data/dictionary.db")
-engine = create_engine(f"sqlite:///{db_path}")
+engine = create_engine(f"sqlite:///{DB_PATH}")
 SessionLocal = sessionmaker(bind=engine)
 
 
