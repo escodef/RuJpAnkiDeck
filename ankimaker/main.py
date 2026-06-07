@@ -76,7 +76,7 @@ def main():
 
             if not translations:
                 logging.warning(
-                    f"translations not found for {word[0]} with reading {word[2]}"
+                    f"Не найден перевод для слова {word[0]} с чтением {word[2]}"
                 )
                 continue
 

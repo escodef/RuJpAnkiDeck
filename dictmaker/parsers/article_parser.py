@@ -10,7 +10,8 @@ from models.models import Translation
 class ArticleParser:
     JAP_LETTERS = r"\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEF\u4E00-\u9FAF"
     YARXI_RE = re.compile(r"\[([a-z-:]+)\]")
-    JAP_RE = re.compile(rf"^[^\s\w]*[\[\]\/{JAP_LETTERS}\s,]+", re.UNICODE)
+    BIG_YARXI_RE = re.compile(r"^([一-龯]+)\s+([а-яА-ЯёЁ].+)$")
+    JAP_RE = re.compile(rf"^[^\s\w]*[\[\]\/{JAP_LETTERS}\s,]+", re.U)
     LIST_RE = re.compile(r"\d+[\.\)]:?\s+([^:\n]+)")
     LETTER_LIST_RE = re.compile(r"^[а-яёA-Za-z]\)\s?")
     JAP_IN_BRACKETS_RE = re.compile(rf"\(.*?[{JAP_LETTERS}].*?\)|\[{JAP_LETTERS}].*?\]")
@@ -28,14 +29,23 @@ class ArticleParser:
             yarxi_reading = self.YARXI_RE.findall(" ".join(sents[1:4]))
 
             self.logger.debug(yarxi_reading)
+            big_yarxi = self.BIG_YARXI_RE.search(sents[0])
+            self.logger.debug(big_yarxi)
 
-            if yarxi_reading:
+            mainsense = None
+
+            if big_yarxi:
+                word = big_yarxi.group(1)
+                reading = jaconv.alphabet2kana(
+                    text=yarxi_reading[0].replace("-", "").replace(":", "-")
+                )
+                mainsense = self.get_mainsense(sents[0])
+            elif yarxi_reading:
                 word = sents[0]
                 reading = jaconv.alphabet2kana(
-                    yarxi_reading[0].replace("-", "").replace(":", "-")
+                    text=yarxi_reading[0].replace("-", "").replace(":", "-")
                 )
                 strip = 2
-
             else:
                 reading = entry.splitlines()[0].strip()
                 if not has_cyrillic(sents[1]):
@@ -61,7 +71,8 @@ class ArticleParser:
             if is_article_recur:
                 continue
 
-            mainsense = self.get_mainsense(senses)
+            if not mainsense:
+                mainsense = self.get_mainsense(senses)
 
             t = Translation(
                 word=word, reading=reading, mainsense=mainsense, senses=senses
@@ -72,6 +83,13 @@ class ArticleParser:
         return ts
 
     def get_mainsense(self, article: str) -> str:
+        big_yarxi = self.BIG_YARXI_RE.search(article.split("\n")[0])
+
+        if big_yarxi:
+            self.logger.debug("большая статья яркси")
+            self.logger.debug(big_yarxi)
+            return big_yarxi.group(2)
+
         lines = article.split("\n")
 
         if "2-я основа" in lines[0]:

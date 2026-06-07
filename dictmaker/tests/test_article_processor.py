@@ -894,7 +894,7 @@ KN1614
 
     assert result.word == "前"
     assert result.reading == "まえ"
-    assert result.mainsense == "перед, передний, впереди"
+    assert result.mainsense == "перед"
 
 
 def test_really_bad_yarxi_article_kon(parser: ArticleParser):
@@ -932,3 +932,37 @@ KN0943
     assert result.word == "今"
     assert result.reading == "いま"
     assert result.mainsense == "сейчас"
+
+
+def test_bad_article_tokoro(parser: ArticleParser):
+    test_articles = [
+        """所
+[tokoro]
+1) место; реже 処; 
+2) служебное слово с различными значениями: "когда" и т.п.
+
+TN48965"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "所"
+    assert result.reading == "ところ"
+    assert result.mainsense == "место"
+
+
+def test_bad_article_yakata(parser: ArticleParser):
+    test_articles = [
+        """館
+[yakata]
+уст. дворец, палаты; иначе 屋形
+
+TN69757
+"""
+    ]
+
+    result = parser.process_results(test_articles)[0]
+
+    assert result.word == "館"
+    assert result.reading == "やかた"
+    assert result.mainsense == "дворец"

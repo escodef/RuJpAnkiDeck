@@ -28,10 +28,10 @@ def main():
 
     is_windows = sys.platform == "win32"
     if is_windows:
-        logging.info("Using GUI Parser (Windows)")
+        logging.info("Используем парсер GUI (Windows)")
         parser = WordParserGUI(JARDIC_PATH)
     else:
-        logging.info("Using Web Parser (Non-Windows)")
+        logging.info("Используем веб-скраппер (Non-Windows)")
         parser = WordParser(DICT_URL)
 
     processor = DictionaryProcessor(parser=parser, session=session)
@@ -45,18 +45,18 @@ def main():
 
     try:
         words_to_parse = get_words()
-        processor.parse_words(words_to_parse[:25000])
+        processor.parse_words(words_to_parse[:174])
 
         if processor.dictionary:
             save_to_sqlite(processor.dictionary, session=session)
             session.commit()
 
-        logging.info("Parse completed successfully.")
+        logging.info("Парсинг завершён.")
     except Exception as e:
-        logging.error(f"Fatal error: {e}")
+        logging.error(f"Фатальная ошибка: {e}")
     finally:
         session.close()
-        logging.info("Session closed.")
+        logging.info("Сессия закомичена.")
 
 
 if __name__ == "__main__":

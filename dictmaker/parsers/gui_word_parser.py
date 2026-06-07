@@ -30,7 +30,7 @@ class WordParserGUI(BaseWordParser):
                 title_re=".*Jardic Pro.*", timeout=2
             )
         except Exception:
-            self.logger.debug("App not found. Starting up...")
+            self.logger.debug("Приложение не запущено. Запускаем...")
             Application(backend="uia").start(jardic_path)
             self.app = Application(backend="uia").connect(
                 title_re=".*Jardic Pro.*", timeout=10
@@ -47,7 +47,7 @@ class WordParserGUI(BaseWordParser):
         self.logger.debug(f"Tab items: {tab_items}")
 
         if tab_index < 0 or tab_index >= len(tab_items):
-            self.logger.error(f"Tab index {tab_index} out of range")
+            self.logger.error(f"Индекс вкладки {tab_index} за пределами массива")
             return
 
         tab_item = tab_items[tab_index]
